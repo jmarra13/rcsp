@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <style type="text/css">
+      body {
+         backgroundcolor: white;
+         width: 640;
+      }
+    </style>
+    <title>Revoked Certificates</title>
+  </head>
+
+  <body>
+    <h1>Revoked Certificates</h1>
+
+%if %{REVOKED_COUNT} > 0
+    <p>
+      There are currently %{REVOKED_COUNT} revoked certificates in the 
+      repository:
+    </p>
+    %{REVOKED}
+%endif
+
+%if %{REVOKED_COUNT} == 0
+    <p>
+      There are no revoked certificates in the repository.
+    </p>
+%endif
+    
+    <br>
+    <hr>
+    <font size="-1">
+      <a href="mailto:ca@example.com">ca@example.com</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
+    </font>
+  </body>
+</html>

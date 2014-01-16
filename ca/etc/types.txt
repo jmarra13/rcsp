@@ -1,0 +1,5 @@
+user:User (E-mail, SSL/TLS Client) Certificate
+server:SSL/TLS Server Certificate
+objsign:Object Signing Certificate
+ca:CA Certificate
+root:Self-Signed Root Certificate

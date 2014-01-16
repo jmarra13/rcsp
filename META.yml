@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                CSP
+version:             0.34
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Date::Calc:                    0
+    IPC::Run:                      0
+    Term::Prompt:                  0.1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

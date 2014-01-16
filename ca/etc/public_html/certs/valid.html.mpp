@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <style type="text/css">
+      body {
+         backgroundcolor: white;
+         width: 640;
+      }
+    </style>
+    <title>Valid Certificates</title>
+  </head>
+
+  <body>
+    <h1>Valid Certificates</h1>
+
+%if %{VALID_COUNT} > 0
+    <p>
+      There are currently %{VALID_COUNT} valid certificates in the 
+      repository:
+    </p>
+    %{VALID}
+%endif
+
+%if %{VALID_COUNT} == 0
+    <p>
+      There are no valid certificates in the repository.
+    </p>
+%endif
+    
+    <br>
+    <hr>
+    <font size="-1">
+	<a href="mailto:ca@example.com">ca@example.com</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
+    </font>
+  </body>
+</html>

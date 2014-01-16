@@ -1,0 +1,28 @@
+Revision history for Perl extension SOCE.
+
+0.01  Sat Aug 26 01:39:30 2000
+	- original version; created by h2xs 1.18
+
+0.02  Tue Nov 14 16:21:01 CET 2000
+	- Fixed MANIFEST
+
+0.03  Tue Nov 14 16:21:01 CET 2000
+	- Look for openssl in $OPENSSL env var.
+
+0.04 - 0.06 buggfixes
+	- sign
+
+0.07  Wed Nov 29 00:07:27 CET 2000
+	- Generate both v1 and v2 CRLs
+	- crl_extensions.conf
+	- extensions.conf now copied to ca directory
+	- create
+	- delete
+	- initialize now exists in three versions
+		1. self-signed
+		2. generate request
+		3. copy an existing certificate in place
+
+0.08  Wed Jan 31 20:54:39 CET 2001
+	- Generate public CA website from template mpp-files
+	- Produce DER CRLs as .crl-files

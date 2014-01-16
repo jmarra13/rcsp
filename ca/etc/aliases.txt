@@ -1,0 +1,5 @@
+c:countryName
+ou:organizationalUnitName
+o:organizationName
+cn:commonName
+dc:domainComponent

@@ -1,0 +1,39 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+  <head>
+    <style type="text/css">
+      body {
+         backgroundcolor: white;
+         width: 640;
+      }
+    </style>
+    <title>Certificate Authority: %{SUBJECT_DN}</title>
+  </head>
+
+  <body>
+    <h1>Certificate Authority: %{SUBJECT_DN}</h1>
+    
+    <dl>
+%ifdef SUBJECT_MD5
+      <dt>MD5 fingerprint of CA certificate</dt>
+      <dd><tt>%{SUBJECT_MD5}</tt></dd>
+%endif
+%ifdef SUBJECT_SHA1
+      <dt>SH1 fingerprint of CA certificate</dt>
+      <dd><tt>%{SUBJECT_SHA1}</tt></dd>
+%endif
+    </dl>
+    <br>
+    <ul>
+      <li><a href="ca.crt">CA Certificate</a></li>
+      <li><a href="crl-v1.crl">CRL (version 1)</a></li>
+      <li><a href="crl-v2.crl">CRL (version 2)</a></li>
+      <li><a href="certs">CA Repository</a></li>
+    </ul>
+    <br>
+    <hr>
+    <font size="-1">
+      <a href="mailto:ca@example.com">ca@example.com</a>&nbsp;|&nbsp;Last modified: %{DATE}
+    </font>
+  </body>
+</html>
