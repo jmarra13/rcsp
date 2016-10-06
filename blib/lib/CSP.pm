@@ -242,7 +242,7 @@ x509_extensions         = extensions
 
 default_days            = 365
 default_crl_days        = 30
-default_md              = sha1
+default_md              = sha512
 preserve                = no
 policy                  = policy
 
@@ -254,7 +254,7 @@ distinguished_name      = req_dn
 x509_extensions         = extensions
 string_mask             = nombstr
 prompt                  = no
-default_md              = sha1
+default_md              = sha512
 
 EOC
 	
@@ -724,10 +724,13 @@ EOXML
 	my $html = $self->getCertHTMLOutFile($e,$odir);
 	my $vars = {
 		    DATE=>$date,
-                    HOSTNAME=>hostname,
+		    HOSTNAME=>hostname,
 		    SUBJECT_SERIAL => $e->{serial},
 		    SUBJECT_DN => $e->{subject},
 		    ISSUER_DN => $cinfo->{subject},
+		    SUBJECT_SHA512 => $e->{info}->{fingerprint_sha512},
+		    SUBJECT_SHA384 => $e->{info}->{fingerprint_sha384},
+		    SUBJECT_SHA256 => $e->{info}->{fingerprint_sha256},
 		    SUBJECT_SHA1 => $e->{info}->{fingerprint_sha1},
 		    SUBJECT_MD5 => $e->{info}->{fingerprint_md5},
 		    SUBJECT_NOTBEFORE => $e->{info}->{notbefore},
@@ -742,6 +745,9 @@ EOXML
    <csp:entity serial="$e->{serial}" status="$e->{status}">
      <csp:subjectdn>$e->{subject}</csp:subjectdn>
      <csp:issuerdn>$cinfo->{subject}</csp:issuerdn>
+     <csp:fingerprint type="sha512">$e->{info}->{fingerprint_sha512}</csp:fingerprint>
+     <csp:fingerprint type="sha384">$e->{info}->{fingerprint_sha384}</csp:fingerprint>
+     <csp:fingerprint type="sha256">$e->{info}->{fingerprint_sha256}</csp:fingerprint>
      <csp:fingerprint type="sha1">$e->{info}->{fingerprint_sha1}</csp:fingerprint>
      <csp:fingerprint type="md5">$e->{info}->{fingerprint_md5}</csp:fingerprint>
      <csp:validity>
@@ -810,6 +816,9 @@ EOXML
 		SUBJECT_DN=>$cinfo->{subject},
 		SUBJECT_MD5=>$cinfo->{fingerprint_md5},
 		SUBJECT_SHA1=>$cinfo->{fingerprint_sha1}
+		SUBJECT_SHA512=>$cinfo->{fingerprint_sha512},
+		SUBJECT_SHA384=>$cinfo->{fingerprint_sha384},
+		SUBJECT_SHA256=>$cinfo->{fingerprint_sha256},
 	       };
 
     for my $infile ($self->getTemplates("$dir/public_html/certs",".html.mpp"))
@@ -1242,6 +1251,30 @@ sub certinfo
 	$info{fingerprint_sha1}=$1,last if /SHA1 Fingerprint=(.+)/;
       }
 
+    $_ = $self->{openssl}->cmd('x509',"-noout -sha256 -fingerprint -in $certfile",{noconfig=>1});
+    while ($_)
+      {
+        chomp;
+        s/^\s*\n//o;
+	$info{fingerprint_sha256}=$1,last if /SHA256 Fingerprint=(.+)/o;
+      }
+
+    $_ = $self->{openssl}->cmd('x509',"-noout -sha384 -fingerprint -in $certfile",{noconfig=>1});
+    while ($_)
+      {
+        chomp;
+        s/^\s*\n//o;
+	$info{fingerprint_sha384}=$1,last if /SHA384 Fingerprint=(.+)/o;
+      }
+
+    $_ = $self->{openssl}->cmd('x509',"-noout -sha512 -fingerprint -in $certfile",{noconfig=>1});
+    while ($_)
+      {
+        chomp;
+        s/^\s*\n//o;
+	$info{fingerprint_sha512}=$1,last if /SHA512 Fingerprint=(.+)/o;
+      }
+
     \%info;
   }
 
@@ -1333,6 +1366,9 @@ sub dump
     printf "%-8s: %s\n",'Subject',$self->{subject};
     printf "%-8s: %s\n",'Expires',strftime("%a %b %e %H:%M:%S %Y",@{$self->{expires}});
     printf "%-8s: %s\n",'Revoked',strftime("%a %b %e %H:%M:%S %Y",@{$self->{revoked}}) if $self->{revoked};
+    printf "%-8s: %s\n",'SHA512',$self->info('fingerprint_sha512') if $self->info('fingerprint_sha512');
+    printf "%-8s: %s\n",'SHA384',$self->info('fingerprint_sha384') if $self->info('fingerprint_sha384');
+    printf "%-8s: %s\n",'SHA256',$self->info('fingerprint_sha256') if $self->info('fingerprint_sha256');
     printf "%-8s: %s\n",'SHA1',$self->info('fingerprint_sha1') if $self->info('fingerprint_sha1');
     printf "%-8s: %s\n",'MD5',$self->info('fingerprint_md5') if $self->info('fingerprint_md5');
     if ($self->{getcontents})
@@ -1756,6 +1792,12 @@ the following variables are available:
                     certificate.
   ISSUER_DN         The distinguished name (DN) of the 
                     CA certificate.
+  SUBJECT_SHA512    The SHA512-fingerprint of the 
+                    certificate.
+  SUBJECT_SHA384    The SHA384-fingerprint of the 
+                    certificate.
+  SUBJECT_SHA256    The SHA256-fingerprint of the 
+                    certificate.
   SUBJECT_SHA1      The SHA1-fingerprint of the 
                     certificate.
   SUBJECT_MD5       The MD5-fingerprint of the 
@@ -1787,6 +1829,12 @@ following variables are available:
   SUBJECT_MD5        The MD5-fingerprint of the CA 
                      certificate.
   SUBJECT_SHA1       The SHA1-fingerprint of the CA 
+                     certificate.
+  SUBJECT_SHA512     The SHA512-fingerprint of the 
+                     certificate.
+  SUBJECT_SHA384     The SHA384-fingerprint of the 
+                     certificate.
+  SUBJECT_SHA256     The SHA256-fingerprint of the 
                      certificate.
 
 =head1 AUTHOR
