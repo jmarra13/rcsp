@@ -1493,7 +1493,7 @@ sub close
     close $self->{fh} if defined $self->{fh};
     unless ($ENV{CSPDEBUG})
       {
-	unlink $self->{conf} if $self->{conf};
+	      unlink $self->{conf} if $self->{conf};
       }
     (defined $_[0]->{rc} ? $_[0]->{rc} : $?);
   }
