@@ -32,101 +32,101 @@ $0 <ca name> init
              [--crtfile=<PEM certificate>]
 
 $0 <ca name> init
-             [--keysize=<size>]
-             [--keypass=<ca private key password>]
-             [--keyfile=<private key file>]
-             [--csrfile=<output PKCS10 request>]
-             [--days=<ca certificate validity (days)>]
-             [--email=<subjectAltName email>]
-             [--url=<subjectAltName url>]
-             [--crldays=<days to first CRL update>]
-             [--crlhours=<hours to first CRL update>]
-             [--digest=<sha1*|md5|md2|mdc2>]
+             [--keysize=<decimal integer bits, default 4096)>]
+             [--keypass=<string ca private key password>]
+             [--keyfile=<string path to private key file>]
+             [--csrfile=<string path to output PKCS10 request>]
+             [--days=<decimal integer days until ca certificate expiry (default 365)>]
+             [--email=<string subjectAltName email>]
+             [--url=<string subjectAltName url>]
+             [--crldays=<decimal integer days to first CRL update>]
+             [--crlhours=<decimal integer hours to first CRL update>]
+             [--digest=<string one of: sha512*|sha384|sha256> (default *)]
              [--verbose]+
-             [--type=<root|ca>]
-             <CA Subject (X509 Name)>
+             [--type=<string one of: root|ca>]
+             {CA Subject (X509 Distinguished Name) !REQUIRED!}
 EOU
 
 $usage{request}=<<EOU;
-$0 <ca name> request
-             [--keysize=<size>]
-             [--keypass=<subject private key password>]
-             [--keyfile=<private key file>]
-             [--type=<*user|server|objsign|ca>]
-             [--csrfile=<output pkcs10 request file>]
+$0 <ca name> request 
+             [--keysize=<decimal integer bits, default 4096)>]
+             [--keypass=<string subject private key password>]
+             [--keyfile=<string path to private key file>]
+             [--type=<string one of: *user|server|objsign|ca>]
+             [--csrfile=<string path to output pkcs10 request file>]
              [--noconfirm]
              [--verbose]+
-             [--digest=<sha1*|md5|md2|mdc2>]
-             {<X509 Name>|<RFC822 address>|<DNS name>}
+             [--digest=<string one of: sha512*|sha384|256> (default *)]
+             {<X509 Distinguished Name>|<RFC822 address>|<DNS name> !REQUIRED! }
 EOU
 
 $usage{issue}=<<EOU;
 $0 <ca name> issue
-             [--keysize=<size> ]
-             [--keypass=<subject private key password>]
-             [--keyfile=<private key file>]
+             [--keysize=<decimal integer bits, default 4096)>]
+             [--keypass=<string subject private key password>]
+             [--keyfile=<string path to private key file>]
              [--noconfirm]
              [--verbose]+
-             [--type=<*user|server|objsign|ca>]
+             [--type=<string one of: user*|server|objsign|ca> (default *)]
 
   - delta -
-             [--days=<certificate validity (days)>]
-             [--hours=<certificate validity (hours)>]
-             [--mins=<certificate validity (minutes)>]
-             [--secs=<certificate validity (seconds)>]
+             [--days=<decimal integer certificate validity (days)>]
+             [--hours=<decimal integer certificate validity (hours)>]
+             [--mins=<decimal integer certificate validity (minutes)>]
+             [--secs=<decimal integer certificate validity (seconds)>]
   - absolute -
-             [--startdate=<certificate validity (start-date)>]
-             [--enddate=<certificate validity (end-date)>]
+             [--startdate=<certificate validity (start-date: YYYYMMDDHHMMSSz)>]
+             [--enddate=<certificate validity (end-date: YYYYMMDDHHMMSSz)>]
 
-             [--capass=<CA private key password>]
-             [--email=<subjectAltName email>]
-             [--url=<subjectAltName url>]
-             [--ip=<subjectAltName ip address>]
-             [--dns=<subjectAltName dns name>]
-             [--digest=<sha1*|md5|md2|mdc2>]
-             {<X509 Name>|<RFC822 address>|<DNS name>}
+             [--capass=<tring A private key password>]
+             [--email=<string subjectAltName email>]
+             [--url=<string subjectAltName url>]
+             [--ip=<string subjectAltName ip address>]
+             [--dns=<string subjectAltName dns name>]
+             [--digest=<string one of: sha512*|sha384|256> (default *)]
+             {<X509 Distinguished Name>|<RFC822 address>|<DNS name> !REQUIRED! }
 EOU
 
 $usage{sign}=<<EOU;
 $0 <ca name> sign
-             [--type=<*user|server|objsign|ca>]
+             [--type=<string one of: user*|server|objsign|ca> (default *)]
   - delta -
-             [--days=<certificate validity (days)>]
-             [--hours=<certificate validity (hours)>]
-             [--mins=<certificate validity (minutes)>]
-             [--secs=<certificate validity (seconds)>]
+             [--days=<decimal integer certificate validity (days)>]
+             [--hours=<decimal integer certificate validity (hours)>]
+             [--mins=<decimal integer certificate validity (minutes)>]
+             [--secs=<decimal integer certificate validity (seconds)>]
   - absolute -
-             [--startdate=<certificate validity (start-date)>]
-             [--enddate=<certificate validity (end-date)>]
+             [--startdate=<date certificate validity (start-date: YYYYMMDDHHMMSSz)>]
+             [--enddate=<date certificate expiry (end-date: YYYYMMDDHHMMSSz)>]
 
-             [--capass=<CA private key password>]
-             [--csrfile=<input PKCS10 request>]
-             [--email=<subjectAltName email>]
-             [--url=<subjectAltName url>]
-             [--ip=<subjectAltName ip address>]
-             [--dns=<subjectAltName dns name>]
-             [--digest=<sha1*|md5|md2|mdc2>]
+             [--capass=<string CA private key password>]
+             [--csrfile=<string path to input PKCS10 request>]
+             [--email=<string subjectAltName email>]
+             [--url=<string subjectAltName url>]
+             [--ip=<string subjectAltName ip address>]
+             [--dns=<string subjectAltName dns name>]
+             [--digest=<string one of: sha512*|sha384|256> (default *)]
              [--verbose]+
 EOU
 
 $usage{p12}=<<EOU;
 $0 <ca name> p12
-             [--p12pass=<pkcs12 export password>]
-             [--keypass=<private key password>]
+             [--p12pass=<string pkcs12 export password>]
+             [--keypass=<string private key password>]
              [--verbose]+
              <serial>
 EOU
 
 $usage{revoke}=<<EOU;
-$0 <ca name> revoke <serial>
+$0 <ca name> revoke <hexidecimal integer serial number>
              [--noconfirm] [--quiet[=<level>]]
 EOU
 
 $usage{gencrl}=<<EOU;
 $0 <ca name> gencrl
-             [--crldays=<days to next CRL update>]
-             [--crlhours=<hours to next CRL update>]
-             [--digest=<sha1*|md5|md2|mdc2>]
+             [--crldays=<decimal integer days to next CRL update>]
+             [--crlhours=<decimal integer hours to next CRL update>]
+             [--digest=<sha512*|sha384|256> (default *)]
              [--verbose]+
 EOU
 
@@ -192,46 +192,46 @@ my $cmd  = shift @ARGV;
 
 my $csp = CSP->new($home,$name);
 
-my %args = (keysize => 1024,
-	    days    => 365,
-	    crldays => 30,
-	    crlhours=> 0,
-	    type    => 'user',
-	    verbose => 0,
-	    confirm => 1,
-	    xinfo   => 0,
-	    contents=> 0,
-	    digest  => 'sha1',
-	    help    => 0,
-	    all     => 0);
+my %args = (keysize => 4096,
+      days    => 365,
+      crldays => 30,
+      crlhours=> 0,
+      type    => 'user',
+      verbose => 0,
+      confirm => 1,
+      xinfo   => 0,
+      contents=> 0,
+      digest  => 'sha512',
+      help    => 0,
+      all     => 0);
 
 my @args = ("type=s",
-	    "all!",
-	    "verbose+",
-	    "confirm!",
-	    "keysize=i",
-	    "days=i",
-	    "hours=i",
-	    "mins=i",
-	    "secs=i",
-	    "startdate=s",
-	    "enddate=s",
-	    "xinfo!",
-	    "contents!",
-	    "serial=i",
-	    "keypass=s",
-            "capass=s",
-	    "p12pass:s",
-	    "keyfile=s",
-	    "csrfile=s",
-	    "crtfile=s",
-	    "email=s",
-	    "ip=s",
-	    "dns=s",
-	    "export:s",
-	    "digest=s",
-	    "help!",
-	    "url=s");
+      "all!",
+      "verbose+",
+      "confirm!",
+      "keysize=i",
+      "days=i",
+      "hours=i",
+      "mins=i",
+      "secs=i",
+      "startdate=s",
+      "enddate=s",
+      "xinfo!",
+      "contents!",
+      "serial=i",
+      "keypass=s",
+      "capass=s",
+      "p12pass:s",
+      "keyfile=s",
+      "csrfile=s",
+      "crtfile=s",
+      "email=s",
+      "ip=s",
+      "dns=s",
+      "export:s",
+      "digest=s",
+      "help!",
+      "url=s");
 
 GetOptions(\%args,@args) or die $usage{$cmd};
 die $usage{$cmd} if $args{help};
@@ -245,7 +245,7 @@ SWITCH:
   $cmd eq 'dump' and
     do
       {
-	$csp->dump(\%args);
+  $csp->dump(\%args);
       },last SWITCH;
 
   ##
@@ -255,7 +255,7 @@ SWITCH:
   $cmd eq 'delete' and
     do
       {
-	$csp->delete(\%args);
+  $csp->delete(\%args);
       },last SWITCH;
 
   ##
@@ -265,10 +265,10 @@ SWITCH:
   $cmd eq 'create' and
     do
       {
-	$args{keysize} = 2048 unless $args{keysize};
-	$args{type} = 'root' unless $args{type};
-	
-	$csp->create(\%args);
+  $args{keysize} = 4096 unless $args{keysize};
+  $args{type} = 'root' unless $args{type};
+  
+  $csp->create(\%args);
       },last SWITCH;
 
   ##
@@ -278,11 +278,11 @@ SWITCH:
   $cmd eq 'init' and
     do
       {
-	die $usage{init} unless @ARGV == 1 or $args{crtfile};
-	
-	$args{dn} = $csp->getDN(shift @ARGV,\%args) if @ARGV;
+  die $usage{init} unless @ARGV == 1 or $args{crtfile};
+  
+  $args{dn} = $csp->getDN(shift @ARGV,\%args) if @ARGV;
         $args{type} = 'root' unless $args{type};
-	$csp->init(\%args);
+  $csp->init(\%args);
       },last SWITCH;
 
   ##
@@ -292,11 +292,11 @@ SWITCH:
   $cmd eq 'request' and
     do
       {
-	die $usage{request} unless @ARGV == 1;
-	
-	$args{dn} = $csp->getDN(shift @ARGV,\%args);
-	
-	$csp->request(\%args);
+  die $usage{request} unless @ARGV == 1;
+  
+  $args{dn} = $csp->getDN(shift @ARGV,\%args);
+  
+  $csp->request(\%args);
       },last SWITCH;
 
   ##
@@ -306,10 +306,10 @@ SWITCH:
   $cmd eq 'p12' and
     do
       {
-	die $usage{p12} unless @ARGV == 1;
-	$args{serial} = $ARGV[0] unless $args{serial};
-	
-	$csp->export_pkcs12(\%args);
+  die $usage{p12} unless @ARGV == 1;
+  $args{serial} = $ARGV[0] unless $args{serial};
+  
+  $csp->export_pkcs12(\%args);
       },last SWITCH;
 
   ##
@@ -319,11 +319,11 @@ SWITCH:
   $cmd eq 'issue' and
     do
       {
-	die $usage{issue} unless 1 == @ARGV;
-	
-	$args{dn} = $csp->getDN(shift @ARGV,\%args);
-	
-	$csp->issue(\%args);
+  die $usage{issue} unless 1 == @ARGV;
+  
+  $args{dn} = $csp->getDN(shift @ARGV,\%args);
+  
+  $csp->issue(\%args);
       },last SWITCH;
 
   ##
@@ -333,7 +333,7 @@ SWITCH:
   $cmd eq 'sign' and
     do
       {
-	$csp->issue(\%args);
+  $csp->issue(\%args);
       },last SWITCH;
 
   ##
@@ -343,11 +343,11 @@ SWITCH:
   $cmd eq 'revoke' and
     do
       {
-	die $usage{revoke} unless 1 == @ARGV || $args{serial};
-	
-	$args{serial} = shift unless $args{serial};
-	
-	$csp->revoke(\%args);
+  die $usage{revoke} unless 1 == @ARGV || $args{serial};
+  
+  $args{serial} = shift unless $args{serial};
+  
+  $csp->revoke(\%args);
       },last SWITCH;
 
   ##
@@ -357,7 +357,7 @@ SWITCH:
   $cmd eq 'gencrl' and
     do
       {
-	$csp->gencrl(\%args);
+  $csp->gencrl(\%args);
       },last SWITCH;
 
   ##
@@ -367,7 +367,7 @@ SWITCH:
   ($cmd eq 'genpublic') and
     do
       {
-	$csp->genPublic(\%args);
+  $csp->genPublic(\%args);
       },last SWITCH;
 
   ##
@@ -377,7 +377,7 @@ SWITCH:
   ($cmd eq 'list' or $cmd eq 'show') and
     do
       {
-	map { $_->dump(); } $csp->list(\%args,'CSP::Entity');
+  map { $_->dump(); } $csp->list(\%args,'CSP::Entity');
       },last SWITCH;
 
   die $usage{_nocmd_};
