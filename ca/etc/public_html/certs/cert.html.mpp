@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<!DOCTYPE HTML>
 <html>
   <head>
     <style type="text/css">
@@ -21,10 +21,10 @@
     <dl>
       <dt>Download certificate</dt>
       <dd>
-	<ul>
-	  <li><a href="%{SUBJECT_SERIAL}.pem">PEM format</a></li>
-	  <li><a href="%{SUBJECT_SERIAL}.crt">DER format</a></li>
-	</ul>
+  <ul>
+    <li><a href="%{SUBJECT_SERIAL}.pem">PEM format</a></li>
+    <li><a href="%{SUBJECT_SERIAL}.crt">DER format</a></li>
+  </ul>
       </dd>
       
       <dt>Subject:</dt>
@@ -43,15 +43,31 @@
       <dd><tt>%{SUBJECT_NOTAFTER}</tt></dd>
 %endif
 
-      <dt>SHA1 Fingerprint:</dt>
+%ifdef SUBJECT_SHA512
+      <dt>SHA512 fingerprint of certificate</dt>
+      <dd><tt>%{SUBJECT_SHA512}</tt></dd>
+%endif
+%ifdef SUBJECT_SHA384
+      <dt>SHA384 fingerprint of certificate</dt>
+      <dd><tt>%{SUBJECT_SHA384}</tt></dd>
+%endif
+%ifdef SUBJECT_SHA256
+      <dt>SHA256 fingerprint of certificate</dt>
+      <dd><tt>%{SUBJECT_SHA256}</tt></dd>
+%endif
+%ifdef SUBJECT_SHA1
+      <dt>SHA1 fingerprint of certificate</dt>
       <dd><tt>%{SUBJECT_SHA1}</tt></dd>
-      <dt>MD5 Fingerprint:</dt>
+%endif
+%ifdef SUBJECT_MD5
+      <dt>MD5 fingerprint of certificate</dt>
       <dd><tt>%{SUBJECT_MD5}</tt></dd>
+%endif
     </dl>
     <br>
     <hr>
     <font size="-1">
-	<a href="mailto:ca@example.com">ca@example.com</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
+  <a href="mailto:ca@example.com">ca@example.com</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
     </font>
   </body>
 </html>
