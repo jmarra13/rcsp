@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<!DOCTYPE html>
 <html>
   <head>
     <style type="text/css">
@@ -14,13 +14,25 @@
     <h1>Certificate Authority: %{SUBJECT_DN}</h1>
     
     <dl>
+%ifdef SUBJECT_SHA512
+      <dt>SHA512 fingerprint of CA certificate</dt>
+      <dd><tt>%{SUBJECT_SHA512}</tt></dd>
+%endif
+%ifdef SUBJECT_SHA384
+      <dt>SHA384 fingerprint of CA certificate</dt>
+      <dd><tt>%{SUBJECT_SHA384}</tt></dd>
+%endif
+%ifdef SUBJECT_SHA256
+      <dt>SHA256 fingerprint of CA certificate</dt>
+      <dd><tt>%{SUBJECT_SHA256}</tt></dd>
+%endif
+%ifdef SUBJECT_SHA1
+      <dt>SHA1 fingerprint of CA certificate</dt>
+      <dd><tt>%{SUBJECT_SHA1}</tt></dd>
+%endif
 %ifdef SUBJECT_MD5
       <dt>MD5 fingerprint of CA certificate</dt>
       <dd><tt>%{SUBJECT_MD5}</tt></dd>
-%endif
-%ifdef SUBJECT_SHA1
-      <dt>SH1 fingerprint of CA certificate</dt>
-      <dd><tt>%{SUBJECT_SHA1}</tt></dd>
 %endif
     </dl>
     <br>
