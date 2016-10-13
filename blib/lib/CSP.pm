@@ -17,7 +17,7 @@ use Sys::Hostname;
 # Do not simply export all your public functions/methods/constants.
 @EXPORT = qw();
 @EXPORT_OK = qw($_openssl);
-$VERSION = '0.34';
+$VERSION = '0.40';
 
 
 # Preloaded methods go here.
@@ -53,10 +53,10 @@ sub new
     open ALIASES,"$dir/etc/aliases.txt";
     while (<ALIASES>)
       {
-	chomp;
-	next unless /\s*([^:]+)\s*:\s*([^:]+)\s*/;
-	$me->{aname}->{lc($1)} = $2;
-	$me->{alias}->{lc($2)} = $1;
+  chomp;
+  next unless /\s*([^:]+)\s*:\s*([^:]+)\s*/;
+  $me->{aname}->{lc($1)} = $2;
+  $me->{alias}->{lc($2)} = $1;
       }
     close ALIASES;
 
@@ -71,14 +71,14 @@ sub DESTROY
 
     foreach my $file (keys %{$self->{_tmpfiles}})
       {
-	unlink $file;
+  unlink $file;
       }
 
     my $dir = $self->caDir();
     if (-d $dir)
       {
-	unlink "$dir/serial.old";
-	unlink "$dir/index.txt.old";
+  unlink "$dir/serial.old";
+  unlink "$dir/index.txt.old";
       }
   }
 
@@ -100,8 +100,8 @@ sub addFile
       or die "unable to open $fn for reading";
     while (<IN>)
       {
-	next if /^\#/;
-	$cf->print($_);
+  next if /^\#/;
+  $cf->print($_);
       }
     close IN;
   }
@@ -128,42 +128,42 @@ sub mppFile
     my $depth = 0;
     while (<IN>)
       {
-	next if /^\#/;
-	
+  next if /^\#/;
+  
       SWITCH:
-	{
-	  last SWITCH unless /^(%if|%ifdef|%endif)/ or $ctx->doPrint();
+  {
+    last SWITCH unless /^(%if|%ifdef|%endif)/ or $ctx->doPrint();
 
-	  if (/^%ifdef\s+([A-Za-z0-9_\.]+)/)
-	    {
-	      $ctx->push(defined $vars->{$1});
-	      last SWITCH;
-	    }
+    if (/^%ifdef\s+([A-Za-z0-9_\.]+)/)
+      {
+        $ctx->push(defined $vars->{$1});
+        last SWITCH;
+      }
 
-	  if (/^%ifndef\s+([A-Za-z0-9_\.]+)/)
-	    {
-	      $ctx->push(not defined $vars->{$1});
-	      last SWITCH;
-	    }
+    if (/^%ifndef\s+([A-Za-z0-9_\.]+)/)
+      {
+        $ctx->push(not defined $vars->{$1});
+        last SWITCH;
+      }
 
-	  if (/^%if\s+(.+)$/)
-	      {
-		my $expr = $1;
-		
-		$expr =~ s/%{([A-Za-z0-9_\.]+)}/"\$vars->{\"$1\"}"/eg;
-		
-		my $result = eval $expr;
-		$self->die("$@") if $@;
-		$ctx->push($result);
-		last SWITCH;
-	      }
+    if (/^%if\s+(.+)$/)
+        {
+    my $expr = $1;
+    
+    $expr =~ s/%{([A-Za-z0-9_\.]+)}/"\$vars->{\"$1\"}"/eg;
+    
+    my $result = eval $expr;
+    $self->die("$@") if $@;
+    $ctx->push($result);
+    last SWITCH;
+        }
 
-	  $ctx->pop(),last SWITCH if /^%endif/;
+    $ctx->pop(),last SWITCH if /^%endif/;
 
-	  $self->mppFile($cf,$vars,$1),last SWITCH if /^%include\s+(.+)/;
+    $self->mppFile($cf,$vars,$1),last SWITCH if /^%include\s+(.+)/;
 
-	  print $cf &_rewrite($vars,$_);
-	}
+    print $cf &_rewrite($vars,$_);
+  }
       }
     close IN;
   }
@@ -181,11 +181,11 @@ sub writeConfig
     my $cf = IO::File->new();
     eval
       {
-	$cf->open(">$cff") 
-	  or die "Unable to open $cff for writing";
-	
-	my $date = localtime();
-	$cf->print(<<EOW);
+  $cf->open(">$cff") 
+    or die "Unable to open $cff for writing";
+  
+  my $date = localtime();
+  $cf->print(<<EOW);
 
 \#\# This file is mashine generated and must not be edited
 \#\# by hand. Please see the CSP-documentation for details.
@@ -207,23 +207,23 @@ opensc = opensc_section
 dynamic_path = $ENV{CSP_OPENSC}/lib/opensc/engine_opensc.so
 
 EOW
-	
-	## Default section
-	$cf->print("[ oids ]\n");
-	$self->addFile($cf,"$self->{dir}/etc/oids.conf");
-	
-	$cf->print("\n[ csp ]\n\n");
-	my ($k,$v);
-	while (($k,$v) = each %{$args})
-	  {
-	    $cf->print("$k\t= $v\n") if ($k ne 'keypass' && $k ne 'capass');
-	  }
-	$cf->print("home\t= $self->{dir}\n");
-	$cf->print("ca\t= $self->{name}\n");
-	$cf->print("\n");
-	
-	## Main sections
-	$cf->print(<<EOC);
+  
+  ## Default section
+  $cf->print("[ oids ]\n");
+  $self->addFile($cf,"$self->{dir}/etc/oids.conf");
+  
+  $cf->print("\n[ csp ]\n\n");
+  my ($k,$v);
+  while (($k,$v) = each %{$args})
+    {
+      $cf->print("$k\t= $v\n") if ($k ne 'keypass' && $k ne 'capass');
+    }
+  $cf->print("home\t= $self->{dir}\n");
+  $cf->print("ca\t= $self->{name}\n");
+  $cf->print("\n");
+  
+  ## Main sections
+  $cf->print(<<EOC);
 
 [ ca ]
 
@@ -257,77 +257,77 @@ prompt                  = no
 default_md              = sha512
 
 EOC
-	
-	## Extension based on command
-	
-	my $type = $args->{type};
+  
+  ## Extension based on command
+  
+  my $type = $args->{type};
         my $name = $self->{name};
-	if ($cmd eq 'x509' || $cmd eq 'req' || $cmd eq 'ca')
-	  {
-	    $cf->print("[ policy ]\n\n");
-	    foreach my $attr (keys %{$args->{name_attributes}})
-	      {
-		next unless $attr;
-		if ($self->{aname}->{lc($attr)}) 
-		  {
-		    $cf->print("$self->{aname}->{lc($attr)} = optional\n")
-		  }
-		else 
-		  {
-		    $cf->print("$attr = optional\n");
-		  }
-	      }
+  if ($cmd eq 'x509' || $cmd eq 'req' || $cmd eq 'ca')
+    {
+      $cf->print("[ policy ]\n\n");
+      foreach my $attr (keys %{$args->{name_attributes}})
+        {
+    next unless $attr;
+    if ($self->{aname}->{lc($attr)}) 
+      {
+        $cf->print("$self->{aname}->{lc($attr)} = optional\n")
+      }
+    else 
+      {
+        $cf->print("$attr = optional\n");
+      }
+        }
 
-	    ## Define a few CPP/MPP-style variables and run the prototype file
-	    $args->{uc("type_$type")}++;
-	    foreach my $x (qw(email url ip dns))
-	      {
-		$args->{uc($x)} = $args->{$x};
-	      }
-	    $cf->print("\n\n");
-	    if ($name)
-	      {
-		my $econf = "$self->{dir}/csp/$name/extensions.conf";
-		$econf = "$self->{dir}/etc/extensions.conf" unless -f $econf;
-		
-		$self->mppFile($cf,$args,$econf);
-	      }
-	    $cf->print("\n\n");
-	    if ($name)
-	      {
-		my $econf = "$self->{dir}/csp/$name/crl_extensions.conf";
-		$econf = "$self->{dir}/etc/crl_extensions.conf" unless -f $econf;
-		
-		$self->mppFile($cf,$args,$econf);
-	      }
-	    $cf->print("\n");
-	  }
+      ## Define a few CPP/MPP-style variables and run the prototype file
+      $args->{uc("type_$type")}++;
+      foreach my $x (qw(email url ip dns))
+        {
+    $args->{uc($x)} = $args->{$x};
+        }
+      $cf->print("\n\n");
+      if ($name)
+        {
+    my $econf = "$self->{dir}/csp/$name/extensions.conf";
+    $econf = "$self->{dir}/etc/extensions.conf" unless -f $econf;
+    
+    $self->mppFile($cf,$args,$econf);
+        }
+      $cf->print("\n\n");
+      if ($name)
+        {
+    my $econf = "$self->{dir}/csp/$name/crl_extensions.conf";
+    $econf = "$self->{dir}/etc/crl_extensions.conf" unless -f $econf;
+    
+    $self->mppFile($cf,$args,$econf);
+        }
+      $cf->print("\n");
+    }
 
-	my $dn = $args->{dn};
-	if ($dn)
-	  {
-	    my %acount;
+  my $dn = $args->{dn};
+  if ($dn)
+    {
+      my %acount;
 
-	    $cf->print("[ req_dn ]\n\n");
-	    foreach my $rdn (split /\s*,\s*/,$dn)
-	      {
-		next unless $rdn =~ /^([^=]+)\s*=\s*([^=]+)$/;
-		my $n = exists $self->{aname}->{lc($1)} ? $self->{aname}->{lc($1)} : $1;
-		$args->{_nrdn}++; ## At the end of the run _nrdn contains the
-		                  ## number of newlines to send to openssl.
-		my $pos = $acount{$n}++;
-		$cf->print($pos.".${n}\t\t= $2\n");
-	      }
-	    $cf->print("\n");
-	  }
-	
-	$cf->close;
+      $cf->print("[ req_dn ]\n\n");
+      foreach my $rdn (split /\s*,\s*/,$dn)
+        {
+    next unless $rdn =~ /^([^=]+)\s*=\s*([^=]+)$/;
+    my $n = exists $self->{aname}->{lc($1)} ? $self->{aname}->{lc($1)} : $1;
+    $args->{_nrdn}++; ## At the end of the run _nrdn contains the
+                      ## number of newlines to send to openssl.
+    my $pos = $acount{$n}++;
+    $cf->print($pos.".${n}\t\t= $2\n");
+        }
+      $cf->print("\n");
+    }
+  
+  $cf->close;
       };
     if ($@)
       {
-	$cf->close;
-	#unlink $cff; ## uncomment when debugging
-	$self->die($@);
+  $cf->close;
+  #unlink $cff; ## uncomment when debugging
+  $self->die($@);
       }
 
     return $cff;
@@ -381,18 +381,18 @@ sub getPassword
 
     system("stty -echo") &&
       $self->die("Unable to configure tty for password entry");
-	
+  
     print STDERR $self->message("$comment: ");
     chop($pw = <STDIN>);
     print STDERR "\n";
 
     if ($reenter)
       {
-	$pwr = $self->getPassword("Re-enter $comment");
+  $pwr = $self->getPassword("Re-enter $comment");
       }
     else
       {
-	$pwr = $pw;
+  $pwr = $pw;
       }
 
     system("stty echo") &&
@@ -415,7 +415,7 @@ sub genkey
     $self->die("Required parameter keyfile missing")
       unless $args->{keyfile};
 
-    $args->{keysize} = 1024 unless $args->{keysize} > 0;
+    $args->{keysize} = 4096 unless $args->{keysize} > 0;
     $args->{keypass} = $self->getPassword("Private key password",1)
       unless $args->{keypass};
 
@@ -456,53 +456,53 @@ sub init
 
     if ($args->{crtfile})
       {
-	system('cp',$args->{crtfile},"$dir/ca.crt");
-	$self->warn("Successfully initialized CA $self->{name}")
-	  if $args->{verbose};
+  system('cp',$args->{crtfile},"$dir/ca.crt");
+  $self->warn("Successfully initialized CA $self->{name}")
+    if $args->{verbose};
       }
     else
       {
-	$self->die("Required parameter dn missing")
-	  unless $args->{dn};
-	
-	$args->{type} = 'root' unless $args->{type};
-	$args->{days} = 3 * 365 unless $args->{days};
-	
-	my $cakey = "$dir/private/ca.key";
-	my $cacert = "$dir/ca.crt";
-	
-	unless (-f $args->{keyfile})
-	  {
-	    ## Generate the CA key
-	    $self->warn("Generating CA key")
-	      if $args->{verbose};
-	    $args->{keyfile} = $cakey;
-	    defined $self->genkey($args) or
-	      $self->die("Unable to generate CA key in $cakey");
-	    $self->die("CA key must have a password")
-	      unless defined($args->{keypass});
-	  }
-	
-	$args->{capass} = $args->{keypass};
-	
-	## Generate and optionally self-sign the request
-	my $process;
-	my $what;
-	my $common_args = "-$args->{digest} -days $args->{days} ".
-	  " -key $cakey -passin pass:$args->{keypass}";
-	if ($args->{csrfile})
-	  {
-	    $self->{openssl}->cmd('req',"-new $common_args -out $args->{csrfile}",$args);
-	    $what = "generated CA request for";
-	  }
-	else
-	  {
-	    $self->{openssl}->cmd('req',"-x509 $common_args -new -out $cacert",$args);
-	    $what = "initialized self-signed";
-	  }
-	
-	$self->warn("Successfully $what CA $self->{name}")
-	  if $args->{verbose};
+  $self->die("Required parameter dn missing")
+    unless $args->{dn};
+  
+  $args->{type} = 'root' unless $args->{type};
+  $args->{days} = 3 * 365 unless $args->{days};
+  
+  my $cakey = "$dir/private/ca.key";
+  my $cacert = "$dir/ca.crt";
+  
+  unless (-f $args->{keyfile})
+    {
+      ## Generate the CA key
+      $self->warn("Generating CA key")
+        if $args->{verbose};
+      $args->{keyfile} = $cakey;
+      defined $self->genkey($args) or
+        $self->die("Unable to generate CA key in $cakey");
+      $self->die("CA key must have a password")
+        unless defined($args->{keypass});
+    }
+  
+  $args->{capass} = $args->{keypass};
+  
+  ## Generate and optionally self-sign the request
+  my $process;
+  my $what;
+  my $common_args = "-$args->{digest} -days $args->{days} ".
+    " -key $cakey -passin pass:$args->{keypass}";
+  if ($args->{csrfile})
+    {
+      $self->{openssl}->cmd('req',"-new $common_args -out $args->{csrfile}",$args);
+      $what = "generated CA request for";
+    }
+  else
+    {
+      $self->{openssl}->cmd('req',"-x509 $common_args -new -out $cacert",$args);
+      $what = "initialized self-signed";
+    }
+  
+  $self->warn("Successfully $what CA $self->{name}")
+    if $args->{verbose};
       }
   }
 
@@ -577,9 +577,9 @@ sub request
     ## Generate a key unless one already exists
     if (! -r $args->{keyfile})
       {
-	$self->warn("Generating new key") if $args->{verbose};
-	$self->genkey($args)
-	  or $self->die("Unable to generate key in $args->{keyfile}");
+  $self->warn("Generating new key") if $args->{verbose};
+  $self->genkey($args)
+    or $self->die("Unable to generate key in $args->{keyfile}");
       }
 
     ## Generate a certificate request
@@ -623,11 +623,11 @@ sub gencrl
 
     if ($hours)
       {
-	$time = "-crlhours $hours"
+  $time = "-crlhours $hours"
       }
     else
       {
-	$time = "-crldays $days";
+  $time = "-crldays $days";
       }
     my $common = "-batch -md $args->{digest} -passin pass:$args->{capass} -gencrl $time";
 
@@ -657,14 +657,14 @@ sub list
     my @out;
     while (<DB>) 
       {
-	chomp;
-	my @row = split /\t/;
-	
-	next if ($row[0] ne 'V' && !$args->{all});
-	next if ($args->{serial} && $row[3] != $args->{serial});
-	
-	my $entity = $eclass->new($self,\@row,$args->{xinfo},$args->{contents});
-	push(@out,$entity) if ref $entity;
+  chomp;
+  my @row = split /\t/;
+  
+  next if ($row[0] ne 'V' && !$args->{all});
+  next if ($args->{serial} && $row[3] != $args->{serial});
+  
+  my $entity = $eclass->new($self,\@row,$args->{xinfo},$args->{contents});
+  push(@out,$entity) if ref $entity;
       }
     close DB;
     @out;
@@ -721,27 +721,27 @@ EOXML
 
     foreach my $e ($self->list($args,'CSP::Entity'))
       {
-	my $html = $self->getCertHTMLOutFile($e,$odir);
-	my $vars = {
-		    DATE=>$date,
-		    HOSTNAME=>hostname,
-		    SUBJECT_SERIAL => $e->{serial},
-		    SUBJECT_DN => $e->{subject},
-		    ISSUER_DN => $cinfo->{subject},
-		    SUBJECT_SHA512 => $e->{info}->{fingerprint_sha512},
-		    SUBJECT_SHA384 => $e->{info}->{fingerprint_sha384},
-		    SUBJECT_SHA256 => $e->{info}->{fingerprint_sha256},
-		    SUBJECT_SHA1 => $e->{info}->{fingerprint_sha1},
-		    SUBJECT_MD5 => $e->{info}->{fingerprint_md5},
-		    SUBJECT_NOTBEFORE => $e->{info}->{notbefore},
-		    SUBJECT_NOTAFTER => $e->{info}->{notafter}
-		   };
-	
-	my $serial = $e->{serial};
-	
-	my $from = _isodateandtime($e->{info}->{notbefore});
-	my $to = _isodateandtime($e->{info}->{notafter});
-	print XML <<EOXML;
+  my $html = $self->getCertHTMLOutFile($e,$odir);
+  my $vars = {
+        DATE=>$date,
+        HOSTNAME=>hostname,
+        SUBJECT_SERIAL => $e->{serial},
+        SUBJECT_DN => $e->{subject},
+        ISSUER_DN => $cinfo->{subject},
+        SUBJECT_SHA512 => $e->{info}->{fingerprint_sha512},
+        SUBJECT_SHA384 => $e->{info}->{fingerprint_sha384},
+        SUBJECT_SHA256 => $e->{info}->{fingerprint_sha256},
+        SUBJECT_SHA1 => $e->{info}->{fingerprint_sha1},
+        SUBJECT_MD5 => $e->{info}->{fingerprint_md5},
+        SUBJECT_NOTBEFORE => $e->{info}->{notbefore},
+        SUBJECT_NOTAFTER => $e->{info}->{notafter}
+       };
+  
+  my $serial = $e->{serial};
+  
+  my $from = _isodateandtime($e->{info}->{notbefore});
+  my $to = _isodateandtime($e->{info}->{notafter});
+  print XML <<EOXML;
    <csp:entity serial="$e->{serial}" status="$e->{status}">
      <csp:subjectdn>$e->{subject}</csp:subjectdn>
      <csp:issuerdn>$cinfo->{subject}</csp:issuerdn>
@@ -757,34 +757,34 @@ EOXML
    </csp:entity>
 EOXML
 
-	if (-f "$dir/p12/$serial.p12")
-	  {
-	    $vars->{SUBJECT_PKCS12} = "$serial.p12";
-	    system('cp',"$dir/p12/$serial.p12","$odir/certs/$serial.p12");
-	  }
-	
-	my $file = $self->certFile($serial);
-	$self->{openssl}->
-	  cmd('x509',"-in $file -outform DER -out $odir/certs/$serial.crt",{noconfig=>1});
-	
-	system('cp',$file,"$odir/certs/$serial.pem");
+  if (-f "$dir/p12/$serial.p12")
+    {
+      $vars->{SUBJECT_PKCS12} = "$serial.p12";
+      system('cp',"$dir/p12/$serial.p12","$odir/certs/$serial.p12");
+    }
+  
+  my $file = $self->certFile($serial);
+  $self->{openssl}->
+    cmd('x509',"-in $file -outform DER -out $odir/certs/$serial.crt",{noconfig=>1});
+  
+  system('cp',$file,"$odir/certs/$serial.pem");
 
-	$self->mppFile($html,$vars,"$dir/public_html/certs/cert.html.mpp");
-	if ($e->{status} eq 'V')
-	  {
-	    $valid_html .= $self->genHTMLTableRow($args,$e);
-	    $valid_count++;
-	  }
-	elsif ($e->{status} eq 'R')
-	  {
-	    $revoked_html .= $self->genHTMLTableRow($args,$e);
-	    $revoked_count++;
-	  }
-	elsif ($e->{status} eq 'E')
-	  {
-	    $expired_html .= $self->genHTMLTableRow($args,$e);
-	    $expired_count++;
-	  }
+  $self->mppFile($html,$vars,"$dir/public_html/certs/cert.html.mpp");
+  if ($e->{status} eq 'V')
+    {
+      $valid_html .= $self->genHTMLTableRow($args,$e);
+      $valid_count++;
+    }
+  elsif ($e->{status} eq 'R')
+    {
+      $revoked_html .= $self->genHTMLTableRow($args,$e);
+      $revoked_count++;
+    }
+  elsif ($e->{status} eq 'E')
+    {
+      $expired_html .= $self->genHTMLTableRow($args,$e);
+      $expired_count++;
+    }
       }
 
     print XML <<EOXML;
@@ -802,38 +802,38 @@ EOXML
     system('cp',"$dir/crl-v2.crl","$odir/crl-v2.crl");
 
     my $vars = {
-		DATE=>$date,
-                HOSTNAME=>hostname,
-		VALID=>$valid_html,
-		VALID_COUNT=>$valid_count,
-		REVOKED=>$revoked_html,
-		REVOKED_COUNT=>$revoked_count,
-		EXPIRED=>$expired_html,
-		EXPIRED_COUNT=>$expired_count,
-		SUBJECT_SERIAL=>$cinfo->{serial},
-		SUBJECT_NOTAFTER=>$cinfo->{notafter},
-		SUBJECT_NOTBEFORE=>$cinfo->{notbefore},
-		SUBJECT_DN=>$cinfo->{subject},
-		SUBJECT_MD5=>$cinfo->{fingerprint_md5},
-		SUBJECT_SHA1=>$cinfo->{fingerprint_sha1}
-		SUBJECT_SHA512=>$cinfo->{fingerprint_sha512},
-		SUBJECT_SHA384=>$cinfo->{fingerprint_sha384},
-		SUBJECT_SHA256=>$cinfo->{fingerprint_sha256},
-	       };
+      DATE=>$date,
+      HOSTNAME=>hostname,
+      VALID=>$valid_html,
+      VALID_COUNT=>$valid_count,
+      REVOKED=>$revoked_html,
+      REVOKED_COUNT=>$revoked_count,
+      EXPIRED=>$expired_html,
+      EXPIRED_COUNT=>$expired_count,
+      SUBJECT_SERIAL=>$cinfo->{serial},
+      SUBJECT_NOTAFTER=>$cinfo->{notafter},
+      SUBJECT_NOTBEFORE=>$cinfo->{notbefore},
+      SUBJECT_DN=>$cinfo->{subject},
+      SUBJECT_SHA512=>$cinfo->{fingerprint_sha512},
+      SUBJECT_SHA384=>$cinfo->{fingerprint_sha384},
+      SUBJECT_SHA256=>$cinfo->{fingerprint_sha256},
+      SUBJECT_SHA1=>$cinfo->{fingerprint_sha1},
+      SUBJECT_MD5=>$cinfo->{fingerprint_md5}
+         };
 
     for my $infile ($self->getTemplates("$dir/public_html/certs",".html.mpp"))
       {
-	next if $infile eq 'cert.html.mpp'; ## The generic certificate template
-	my $html = $self->getHTMLOutFile("$odir/certs/$infile");
-	$self->mppFile($html,$vars,"$dir/public_html/certs/$infile");
-	$html->close();
+  next if $infile eq 'cert.html.mpp'; ## The generic certificate template
+  my $html = $self->getHTMLOutFile("$odir/certs/$infile");
+  $self->mppFile($html,$vars,"$dir/public_html/certs/$infile");
+  $html->close();
       }
 
     for my $infile ($self->getTemplates("$dir/public_html",".html.mpp"))
       {
-	my $html = $self->getHTMLOutFile("$odir/$infile");
-	$self->mppFile($html,$vars,"$dir/public_html/$infile");
-	$html->close();
+  my $html = $self->getHTMLOutFile("$odir/$infile");
+  $self->mppFile($html,$vars,"$dir/public_html/$infile");
+  $html->close();
       }
   }
 
@@ -912,25 +912,25 @@ sub caBundle
     print BUNDLE "##\n";
     foreach my $certfile (@_)
       {
-	my $info = $self->certinfo($certfile);
-	print BUNDLE "\n$info->{subject}\n";
-	print BUNDLE "=========================================\n";
-	print BUNDLE "MD5 Fingerprint: $info->{fingerprint_md5}\n";
-	print BUNDLE "PEM Data:\n";
-	open CERT,$certfile;
-	while (<CERT>) 
-	  {
-	    print BUNDLE $_;
-	  }
-	close CERT;
-	my $process = $self->{openssl}->
-	  cmd('x509',"-noout -text -in $certfile",{noconfig=>1});
-	my $fh = $process->handle();
-	while (<$fh>)
-	  {
-	    print BUNDLE $_;
-	  }
-	$process->closeok();
+  my $info = $self->certinfo($certfile);
+  print BUNDLE "\n$info->{subject}\n";
+  print BUNDLE "=========================================\n";
+  print BUNDLE "MD5 Fingerprint: $info->{fingerprint_md5}\n";
+  print BUNDLE "PEM Data:\n";
+  open CERT,$certfile;
+  while (<CERT>) 
+    {
+      print BUNDLE $_;
+    }
+  close CERT;
+  my $process = $self->{openssl}->
+    cmd('x509',"-noout -text -in $certfile",{noconfig=>1});
+  my $fh = $process->handle();
+  while (<$fh>)
+    {
+      print BUNDLE $_;
+    }
+  $process->closeok();
       }
     close BUNDLE;
   }
@@ -949,8 +949,8 @@ sub revoke
 
     if ($args->{confirm})
       {
-	 $self->dumpcert($file);
-	 $self->confirm("Really revoke this?","Bye...");
+   $self->dumpcert($file);
+   $self->confirm("Really revoke this?","Bye...");
       }
 
     $args->{capass} = $self->getPassword("CA Private key password")
@@ -985,16 +985,16 @@ sub issue
 
     unless ($args->{csrfile})
       {
-	$args->{csrfile} = $self->tempFile("request","csr");
-	eval
-	  {
-	    $self->request($args);
-	    $args->{p12pass} = $args->{keypass};
-	  };
-	if ($@)
-	  {
-	    $self->die("Unable to generate request: ".$self->exm($@));
-	  }
+  $args->{csrfile} = $self->tempFile("request","csr");
+  eval
+    {
+      $self->request($args);
+      $args->{p12pass} = $args->{keypass};
+    };
+  if ($@)
+    {
+      $self->die("Unable to generate request: ".$self->exm($@));
+    }
       }
 
 #    $self->die("No csr file $args->{csrfile}")
@@ -1002,42 +1002,42 @@ sub issue
 
     eval
       {
-	if ($args->{confirm})
-	  {
-	    $self->dumpreq($args->{csrfile});
-	    $self->confirm("Really sign this?","Bye...");
-	  }
-	
-	$self->warn("Signing request") if $args->{verbose};
-	
-	my $serial;
-	open SERIAL,"$dir/serial";
-	chomp($serial = <SERIAL>);
-	close SERIAL;
-	
-	$args->{capass} = $self->getPassword("CA Private key password")
-	  unless $args->{capass};
-	$self->die("CA key must have a password")
-	  unless defined($args->{capass});
+  if ($args->{confirm})
+    {
+      $self->dumpreq($args->{csrfile});
+      $self->confirm("Really sign this?","Bye...");
+    }
+  
+  $self->warn("Signing request") if $args->{verbose};
+  
+  my $serial;
+  open SERIAL,"$dir/serial";
+  chomp($serial = <SERIAL>);
+  close SERIAL;
+  
+  $args->{capass} = $self->getPassword("CA Private key password")
+    unless $args->{capass};
+  $self->die("CA key must have a password")
+    unless defined($args->{capass});
 
-	$args->{startdate} = $self->_time()
-	  unless $args->{startdate};
-	$args->{enddate} =
-	  $self->_time($args->{days} or 365,$args->{hours},$args->{mins},$args->{secs})
-	    unless $args->{enddate};
+  $args->{startdate} = $self->_time()
+    unless $args->{startdate};
+  $args->{enddate} =
+    $self->_time($args->{days} or 365,$args->{hours},$args->{mins},$args->{secs})
+      unless $args->{enddate};
 
-	$self->{openssl}->cmd('ca',
-			      "-batch -md $args->{digest} -startdate $args->{startdate} ".
-			      "-enddate $args->{enddate} ".
-			      "-passin pass:$args->{capass} -preserveDN -outdir $dir/certs ".
-			      "-in $args->{csrfile}",$args);
-	rename $args->{keyfile},"$dir/private/keys/$serial.key";
-	$self->unTempFile($args->{keyfile});
-	$args->{serial} = $serial;
+  $self->{openssl}->cmd('ca',
+            "-batch -md $args->{digest} -startdate $args->{startdate} ".
+            "-enddate $args->{enddate} ".
+            "-passin pass:$args->{capass} -preserveDN -outdir $dir/certs ".
+            "-in $args->{csrfile}",$args);
+  rename $args->{keyfile},"$dir/private/keys/$serial.key";
+  $self->unTempFile($args->{keyfile});
+  $args->{serial} = $serial;
       };
     if ($@)
       {
-	$self->die("Unable to sign request: ".$self->exm($@));
+  $self->die("Unable to sign request: ".$self->exm($@));
       }
   }
 
@@ -1060,11 +1060,11 @@ sub export_pkcs12
     my $othercerts;
     if (-f "$dir/certpath.crt")
       {
-	$othercerts = "-certfile $dir/certpath.crt";
+  $othercerts = "-certfile $dir/certpath.crt";
       }
     else
       {
-	$othercerts = "-certfile $dir/ca.crt";
+  $othercerts = "-certfile $dir/ca.crt";
       }
 
     my $certFile = $self->certFile($serial);
@@ -1076,16 +1076,16 @@ sub export_pkcs12
 
     eval
       {
-	mkdir "$dir/p12",00755 unless -d "$dir/p12";
-	my $p12File = "$dir/p12/$serial.p12";
-	my $cmd = "-export -des3 $othercerts -inkey $keyFile -in $certFile -out $p12File";
-	$cmd .= " -passout pass:$args->{p12pass}" if defined($args->{p12pass});
-	$cmd .= " -passin pass:$args->{keypass}" if defined($args->{keypass});
-	$self->{openssl}->cmd('pkcs12',$cmd,$args);
+  mkdir "$dir/p12",00755 unless -d "$dir/p12";
+  my $p12File = "$dir/p12/$serial.p12";
+  my $cmd = "-export -des3 $othercerts -inkey $keyFile -in $certFile -out $p12File";
+  $cmd .= " -passout pass:$args->{p12pass}" if defined($args->{p12pass});
+  $cmd .= " -passin pass:$args->{keypass}" if defined($args->{keypass});
+  $self->{openssl}->cmd('pkcs12',$cmd,$args);
       };
     if ($@)
       {
-	$self->die("Unable to create pkcs12 object: ".$self->exm($@));
+  $self->die("Unable to create pkcs12 object: ".$self->exm($@));
       }
   }
 
@@ -1098,7 +1098,7 @@ sub ppSubject
     shift @rdns;
     foreach my $aname (keys %{$self->{alias}})
       {
-	map { s/$aname/$self->{alias}->{$aname}/ig; } @rdns;
+  map { s/$aname/$self->{alias}->{$aname}/ig; } @rdns;
       }
     join(',',@rdns);
   }
@@ -1114,25 +1114,25 @@ sub getDN
   SWITCH:
     {
       $dn = $x,last SWITCH
-	if $x =~ /=/; ## probably a distinguished name
+  if $x =~ /=/; ## probably a distinguished name
 
       $dn = $self->email2DN($1,$2,$args),last SWITCH
-	if $x =~ /([^@]+)\@([^@]+)/; ## probably an email address
+  if $x =~ /([^@]+)\@([^@]+)/; ## probably an email address
 
       $dn = $self->domainName2DN($x,$args),last SWITCH
-	if $x =~/\./; ## probably a DNS domain name
+  if $x =~/\./; ## probably a DNS domain name
 
       $self->die("Unknown name form: $x");
     }
 
     foreach my $av (split /\s*[,\/]\s*/,$dn)
       {
-	$self->die("Bad X.501 name $dn") unless $av =~ /([a-zA-Z]+)\s*=\s*([^=]+)/;
-	my $tmp = $1;
-	$tmp =~ s/^\s+//og;
-	$tmp =~ s/\s+$//og;
-	next unless $tmp;
-	$args->{name_attributes}->{$tmp}++;
+  $self->die("Bad X.501 name $dn") unless $av =~ /([a-zA-Z]+)\s*=\s*([^=]+)/;
+  my $tmp = $1;
+  $tmp =~ s/^\s+//og;
+  $tmp =~ s/\s+$//og;
+  next unless $tmp;
+  $args->{name_attributes}->{$tmp}++;
       }
 
     $dn;
@@ -1172,8 +1172,8 @@ sub dumpcert
 
     print $self->{openssl}->
       cmd('x509',
-	  "-text -in $certfile -noout -nameopt RFC2253",
-	  {noconfig=>1,verbose=>1});
+    "-text -in $certfile -noout -nameopt RFC2253",
+    {noconfig=>1,verbose=>1});
   }
 
 sub dumpreq
@@ -1183,8 +1183,8 @@ sub dumpreq
 
     print $self->{openssl}->
       cmd('req',
-	  "-text -in $reqfile -noout",
-	  {noconfig=>1,verbose=>1});
+    "-text -in $reqfile -noout",
+    {noconfig=>1,verbose=>1});
   }
 
 sub exm
@@ -1209,30 +1209,30 @@ sub certinfo
     while ($_)
       {
         s/^\s*\n//o;
-	if (s/^subject=\s*(.+)//o)
-	  {
-	    $info{subject}=$1;
-	    $info{subject} =~ s/\//,/og;
-	    $info{subject} =~ s/^,//og;
-	  }
-	elsif (s/^issuer=\s*(.+)//o)
-	  {
-	    $info{issuer}=$1;
-	    $info{issuer} =~ s/\//,/og;
-	    $info{issuer} =~ s/^,//og;
-	  }
-	elsif (s/^notBefore=\s*(.+)//o)
-	  {
-	    $info{notbefore}=$1;
-	  }
-	elsif (s/^notAfter=\s*(.+)//o)
-	  {
-	    $info{notafter}=$1;
-	  }
-	elsif (s/^serial=\s*(.+)//o)
-	  {
-	    $info{serial}=$1;
-	  }
+  if (s/^subject=\s*(.+)//o)
+    {
+      $info{subject}=$1;
+      $info{subject} =~ s/\//,/og;
+      $info{subject} =~ s/^,//og;
+    }
+  elsif (s/^issuer=\s*(.+)//o)
+    {
+      $info{issuer}=$1;
+      $info{issuer} =~ s/\//,/og;
+      $info{issuer} =~ s/^,//og;
+    }
+  elsif (s/^notBefore=\s*(.+)//o)
+    {
+      $info{notbefore}=$1;
+    }
+  elsif (s/^notAfter=\s*(.+)//o)
+    {
+      $info{notafter}=$1;
+    }
+  elsif (s/^serial=\s*(.+)//o)
+    {
+      $info{serial}=$1;
+    }
       }
 
     $_ = $self->{openssl}->cmd('x509',"-noout -md5 -fingerprint -in $certfile",{noconfig=>1});
@@ -1240,7 +1240,7 @@ sub certinfo
       {
         chomp;
         s/^\s*\n//o;
-	$info{fingerprint_md5}=$1,last if /MD5 Fingerprint=(.+)/o;
+  $info{fingerprint_md5}=$1,last if /MD5 Fingerprint=(.+)/o;
       }
 
     $_ = $self->{openssl}->cmd('x509',"-noout -sha1 -fingerprint -in $certfile",{noconfig=>1});
@@ -1248,7 +1248,7 @@ sub certinfo
       {
         chomp;
         s/^\s*\n//o;
-	$info{fingerprint_sha1}=$1,last if /SHA1 Fingerprint=(.+)/;
+  $info{fingerprint_sha1}=$1,last if /SHA1 Fingerprint=(.+)/;
       }
 
     $_ = $self->{openssl}->cmd('x509',"-noout -sha256 -fingerprint -in $certfile",{noconfig=>1});
@@ -1256,7 +1256,7 @@ sub certinfo
       {
         chomp;
         s/^\s*\n//o;
-	$info{fingerprint_sha256}=$1,last if /SHA256 Fingerprint=(.+)/o;
+  $info{fingerprint_sha256}=$1,last if /SHA256 Fingerprint=(.+)/o;
       }
 
     $_ = $self->{openssl}->cmd('x509',"-noout -sha384 -fingerprint -in $certfile",{noconfig=>1});
@@ -1264,7 +1264,7 @@ sub certinfo
       {
         chomp;
         s/^\s*\n//o;
-	$info{fingerprint_sha384}=$1,last if /SHA384 Fingerprint=(.+)/o;
+  $info{fingerprint_sha384}=$1,last if /SHA384 Fingerprint=(.+)/o;
       }
 
     $_ = $self->{openssl}->cmd('x509',"-noout -sha512 -fingerprint -in $certfile",{noconfig=>1});
@@ -1272,7 +1272,7 @@ sub certinfo
       {
         chomp;
         s/^\s*\n//o;
-	$info{fingerprint_sha512}=$1,last if /SHA512 Fingerprint=(.+)/o;
+  $info{fingerprint_sha512}=$1,last if /SHA512 Fingerprint=(.+)/o;
       }
 
     \%info;
@@ -1337,16 +1337,16 @@ sub new
     my $file = ($row->[4] && $row->[4] ne 'unknown' ? $row->[4] : $csp->certFile($serial));
 
     bless {
-	   csp => $csp,
-	   status => $row->[0],
-	   expires => parse_date($row->[1]),
-	   revoked => ($row->[2] ? parse_date($row->[2]) : undef),
-	   serial => $serial,
-	   file => $file,
-	   subject => $csp->ppSubject($row->[5]),
-	   info => ($getinfo ? $csp->certinfo($file) : {}),
-	   getcontents => $getcontents
-	  },$class;
+     csp => $csp,
+     status => $row->[0],
+     expires => parse_date($row->[1]),
+     revoked => ($row->[2] ? parse_date($row->[2]) : undef),
+     serial => $serial,
+     file => $file,
+     subject => $csp->ppSubject($row->[5]),
+     info => ($getinfo ? $csp->certinfo($file) : {}),
+     getcontents => $getcontents
+    },$class;
   }
 
 my %_status = ('V' => 'Valid','R' => 'Revoked');
@@ -1373,7 +1373,7 @@ sub dump
     printf "%-8s: %s\n",'MD5',$self->info('fingerprint_md5') if $self->info('fingerprint_md5');
     if ($self->{getcontents})
       {
-	$self->dumpcert($self->{file});
+  $self->dumpcert($self->{file});
       }
     print "\n";
   }
@@ -1402,8 +1402,8 @@ sub new
 
     $me{csp} = $csp;
     $me{_handle} = start(\@openssl,
-			 '<',new_appender("\n"),\${$me{_in}},
-			 '>',\${$me{_out}},'2>&1',debug=>0)
+       '<',new_appender("\n"),\${$me{_in}},
+       '>',\${$me{_out}},'2>&1',debug=>0)
       or die "Cannot start $ENV{OPENSSL}: $!\n";
 
     bless \%me,$class;
@@ -1420,15 +1420,15 @@ sub cmd
     my $cfgcmd;
     if ( (grep $_ eq $cmd,qw(req ca)) && !$args->{noconfig})
       {
-	$conf = $self->{csp}->writeConfig($cmd,$args);
-	$self->{csp}->die("Unable to write configuration file") unless -f $conf;
-	$cfgcmd = " -config $conf ";
+  $conf = $self->{csp}->writeConfig($cmd,$args);
+  $self->{csp}->die("Unable to write configuration file") unless -f $conf;
+  $cfgcmd = " -config $conf ";
       }
     elsif ($cmd eq 'x509' && !$args->{noconfig})
       {
-	$conf  = $self->{csp}->writeConfig($cmd,$args);
-	$self->{csp}->die("Unable to write configuration file") unless -f $conf;
-	$cfgcmd = " -extfile $conf -extensions extensions ";
+  $conf  = $self->{csp}->writeConfig($cmd,$args);
+  $self->{csp}->die("Unable to write configuration file") unless -f $conf;
+  $cfgcmd = " -extfile $conf -extensions extensions ";
       }
     $cmd = '' if $cmd eq 'dummy';
 
@@ -1442,10 +1442,10 @@ sub cmd
     my @nout;
     foreach $_ (@out)
       {
-	chomp;
+  chomp;
         s/\s*OpenSSL>\s*//og;
         next unless $_;
-	if (/:error:/) {
+  if (/:error:/) {
            push (@err,$_);
         } else {
            push (@nout,$_);
@@ -1476,27 +1476,27 @@ sub rws_open
     my ($lp,$rp);
     if ($rw eq 'r')
       {
-	$lp = '';
-	$rp = '|';
+  $lp = '';
+  $rp = '|';
       }
     elsif ($rw eq 'w')
       {
-	$lp = '|';
-	$rp = '';
+  $lp = '|';
+  $rp = '';
       }
 
     my $cfgcmd;
     if ( (grep $_ eq $cmd,qw(req ca)) && !$args->{noconfig})
       {
-	$self->{conf}  = $self->{csp}->writeConfig($cmd,$args);
-	$self->{csp}->die("Unable to write configuration file") unless -f $self->{conf};
-	$cfgcmd = " -config $self->{conf} ";
+  $self->{conf}  = $self->{csp}->writeConfig($cmd,$args);
+  $self->{csp}->die("Unable to write configuration file") unless -f $self->{conf};
+  $cfgcmd = " -config $self->{conf} ";
       }
     elsif ($cmd eq 'x509' && !$args->{noconfig})
       {
-	$self->{conf}  = $self->{csp}->writeConfig($cmd,$args);
-	$self->{csp}->die("Unable to write configuration file") unless -f $self->{conf};
-	$cfgcmd = " -extfile $self->{conf} -extensions extensions ";
+  $self->{conf}  = $self->{csp}->writeConfig($cmd,$args);
+  $self->{csp}->die("Unable to write configuration file") unless -f $self->{conf};
+  $cfgcmd = " -extfile $self->{conf} -extensions extensions ";
       }
     $self->{csp} = $csp;
 
@@ -1509,12 +1509,12 @@ sub rws_open
       if $ENV{CSPDEBUG};
     if ($rw eq 's')
       {
-	$self->{rc} = system("$self->{openssl} $cmd $engine $cfgcmd $cmdline ${redirect}");
+  $self->{rc} = system("$self->{openssl} $cmd $engine $cfgcmd $cmdline ${redirect}");
       }
     else
       {
-	open $self->{fh},"${lp}$self->{openssl} $cmd $engine $cfgcmd $cmdline ${redirect}${rp}" or
-	  $self->{csp}->die("Unable to execute: $!");
+  open $self->{fh},"${lp}$self->{openssl} $cmd $engine $cfgcmd $cmdline ${redirect}${rp}" or
+    $self->{csp}->die("Unable to execute: $!");
       }
 
     $self;
@@ -1527,7 +1527,7 @@ sub close
     close $self->{fh} if defined $self->{fh};
     unless ($ENV{CSPDEBUG})
       {
-	unlink $self->{conf} if $self->{conf};
+  unlink $self->{conf} if $self->{conf};
       }
     (defined $_[0]->{rc} ? $_[0]->{rc} : $?);
   }
@@ -1699,7 +1699,7 @@ Use openssl to dump the contents of the CA certificate:
 Now issue a new server certificate signed by PCA:
 
  [leifj@njal CSP]$ ./csp PCA issue \
-                     --keysize=1024 \
+                     --keysize=2048 \
                      --noconfirm \
                      'CN=www.example.com,dc=example,dc=com'
  [CSP][PCA     ] Generating new key
