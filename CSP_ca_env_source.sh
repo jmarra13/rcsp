@@ -8,9 +8,9 @@
  export CSPHOME="$(pwd)"            # cd into ca root directory first
 
  # These are shortcuts for command line construction
- export CSPROG="/root/bin/csp034/csp"
- export CSPCA="CA_HLL_ISSUER_01"    # The Issueing CA - also kept offline
- export CSPCAROOT="CA_HLL_ROOT"     # The offline root CA
+ export CSPROG="/usr/local/bin/csp" # set to whereever the software is
+ export CSPCA="CA_ISSUER_01"        # The Issuing CA - also kept offline
+ export CSPCAROOT="CA_ROOT"         # The offline root CA
  export CSPCDAYS=1827               # The program default is 365 days
  export CSPDIGEST="SHA512"          # Do not use SHA1 
  export CSPKEYSIZE=4096             # Now 4096 is the default CSP.pm value
@@ -25,18 +25,19 @@
  export CSPDAYSDIFF=$(expr $(expr $(date '+%s' -d "${DX}") - $(date '+%s' -d "${DS}")) / 86400 + 1)
 
  # These are the common name (CN)  elements
- export CNOU='Networked Data Services'    # The responsible internal unit
- export CNON='Harte & Lyne Limited'       # Our organisation's name
- export CNLO='Hamilton'                   # Municipality of registration
- export CNST='Ontario'                    # Region of registration
+ # Change these to suit local needs
+ export CNOU='Our Organisational Unit'    # The responsible internal unit
+ export CNON='Our Organisations Name'     # Our organisation's name
+ export CNLO='Our City'                   # Municipality of registration
+ export CNST='Our Region'                 # Province, region or state
  export CNCO='CA'                         # Country code of registration
- export CNEM='certificates@harte-lyne.ca' # CA email
+ export CNEM='certificates@example.com'   # CA email
 
  # Domain names are case insensitive but are made all lowercase by convention.
  export DCHN='ca'                 # set hostname for dns
  export DCLO="${CNLO,,}"          # force domain name location to all lowercase
- export DCDN='harte-lyne'         # our domain name
- export DCTL='ca'                 # our registry top level authority
+ export DCDN='example'            # our domain name
+ export DCTL='com'                # our registry top level authority
 
  echo "The following convenience env variables are now set as displayed below:"
  env | grep -E "^CN|^CS|^DC" | sort
@@ -49,4 +50,9 @@
  echo "CSPSTARTDATE: $CSPSTARTDATE"
  echo "  CSPENDDATE: $CSPENDDATE"
 
- 
+ echo 'The following can be used to determine date offsets'
+ echo 'to end-of-day UTC of the spcified date'
+ echo 'export TDATE=20361031'
+ echo 'EDAYS=$(expr $(expr $(date '+%s' -d $TDATE) - $(date '+%s')) / 86400);'
+ echo 'echo $EDAYS; EDATE="$(date +%F -u -d "$EDAYS days") 23:59:59";'
+ echo 'echo $EDATE; NDATE=$(date -u '+%F %T %Z' -d "$EDATE"); echo $NDATE'
