@@ -48,7 +48,7 @@ $0 <ca name> init
 EOU
 
 $usage{request}=<<EOU;
-$0 <ca name> request 
+$0 <ca name> request
              [--keysize=<decimal integer bits, default 4096)>]
              [--keypass=<string subject private key password>]
              [--keyfile=<string path to private key file>]
@@ -169,6 +169,33 @@ die $usage{_nocmd_} unless @ARGV > 0;
 
 my $name = shift @ARGV;
 
+unless ($ENV{CSPHOME}) {
+  my $message = <<"END_MSG";
+
+  If \$CSPHOME is not set then it is likely that this is
+  an initialisation set up and the working directory for
+  the new CA is not properly prepared.  Refer to the
+  cspguide in the docs directory.
+
+  A bash source script, CSP_ca_env_source.sh, is provided
+  that sets all the required and many additional convenience
+  env variables.  This should be copied into the ca working
+  directory, modified as required for your particular needs,
+  and sourced before running csp.
+
+  \$cd /path/to/ca/root/directory
+  \$source ./CSP_ca_env_source.sh
+  \$csp <command>
+
+  Do not run csp in its install directory.
+
+  The ca directory that ships with csp contains template files
+  that are meant to be copied to the actual location of the new ca.
+  Do not use this directory for your own ca.
+
+END_MSG
+  print $message
+}
 warn "Warning: \$CSPHOME unset. This may prevent CSP from working properly.\n"
   unless $ENV{CSPHOME};
 
@@ -267,7 +294,7 @@ SWITCH:
       {
   $args{keysize} = 4096 unless $args{keysize};
   $args{type} = 'root' unless $args{type};
-  
+
   $csp->create(\%args);
       },last SWITCH;
 
@@ -279,7 +306,7 @@ SWITCH:
     do
       {
   die $usage{init} unless @ARGV == 1 or $args{crtfile};
-  
+
   $args{dn} = $csp->getDN(shift @ARGV,\%args) if @ARGV;
         $args{type} = 'root' unless $args{type};
   $csp->init(\%args);
@@ -293,22 +320,22 @@ SWITCH:
     do
       {
   die $usage{request} unless @ARGV == 1;
-  
+
   $args{dn} = $csp->getDN(shift @ARGV,\%args);
-  
+
   $csp->request(\%args);
       },last SWITCH;
 
   ##
   ## Create a pkcs12 object for a given serial
-  ## 
+  ##
 
   $cmd eq 'p12' and
     do
       {
   die $usage{p12} unless @ARGV == 1;
   $args{serial} = $ARGV[0] unless $args{serial};
-  
+
   $csp->export_pkcs12(\%args);
       },last SWITCH;
 
@@ -320,9 +347,9 @@ SWITCH:
     do
       {
   die $usage{issue} unless 1 == @ARGV;
-  
+
   $args{dn} = $csp->getDN(shift @ARGV,\%args);
-  
+
   $csp->issue(\%args);
       },last SWITCH;
 
@@ -344,9 +371,9 @@ SWITCH:
     do
       {
   die $usage{revoke} unless 1 == @ARGV || $args{serial};
-  
+
   $args{serial} = shift unless $args{serial};
-  
+
   $csp->revoke(\%args);
       },last SWITCH;
 
