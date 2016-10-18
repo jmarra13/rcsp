@@ -187,7 +187,7 @@ sub writeConfig
   my $date = localtime();
   $cf->print(<<EOW);
 
-\#\# This file is mashine generated and must not be edited
+\#\# This file is machine generated and must not be edited
 \#\# by hand. Please see the CSP-documentation for details.
 \#\# $date
 
