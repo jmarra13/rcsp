@@ -71,14 +71,14 @@ sub DESTROY
 
     foreach my $file (keys %{$self->{_tmpfiles}})
       {
-  unlink $file;
+        unlink $file unless $ENV{CSPDEBUG};
       }
 
     my $dir = $self->caDir();
     if (-d $dir)
       {
-  unlink "$dir/serial.old";
-  unlink "$dir/index.txt.old";
+        unlink "$dir/serial.old";
+        unlink "$dir/index.txt.old";
       }
   }
 
@@ -388,11 +388,11 @@ sub getPassword
 
     if ($reenter)
       {
-  $pwr = $self->getPassword("Re-enter $comment");
+        $pwr = $self->getPassword("Re-enter $comment");
       }
     else
       {
-  $pwr = $pw;
+        $pwr = $pw;
       }
 
     system("stty echo") &&
@@ -403,6 +403,9 @@ sub getPassword
 
     return undef
       if length($pw) == 0;
+
+#    $pw = "'" . $pw . "'";
+    $self->warn("# Password is: $pw\n") if $ENV{CSPDEBUG};
 
     $pw;
   }
@@ -416,8 +419,10 @@ sub genkey
       unless $args->{keyfile};
 
     $args->{keysize} = 4096 unless $args->{keysize} > 0;
-    $args->{keypass} = $self->getPassword("Private key password",1)
+    $args->{keypass} = "'" . $self->getPassword("Private key password",1) . "'"
       unless $args->{keypass};
+
+    $self->warn("# Password argument: $args->{keypass}\n") if $ENV{CSPDEBUG};
 
     my $cmd = "-out $args->{keyfile} $args->{keysize}";
     $cmd = "-des3 -passout pass:$args->{keypass} ".$cmd if defined($args->{keypass});
@@ -540,7 +545,7 @@ sub unTempFile
     my $self = shift;
     my $file = shift;
 
-    delete $self->{_tmpfiles}->{$file};
+    delete $self->{_tmpfiles}->{$file} unless $ENV{CSPDEBUG};
   }
 
 sub keyFile
@@ -797,7 +802,7 @@ EOXML
 
     my $pp = $self->{openssl}->
       cmd('x509',"-inform PEM -in $dir/ca.crt -outform PEM -out $odir/ca.crt",{noconfig=>1});
-    #system('cp',"$dir/ca.crt","$odir/ca.crt");
+    system('cp',"$dir/ca.crt","$odir/ca.crt");
     system('cp',"$dir/crl-v1.crl","$odir/crl-v1.crl");
     system('cp',"$dir/crl-v2.crl","$odir/crl-v2.crl");
 
@@ -1527,7 +1532,7 @@ sub close
     close $self->{fh} if defined $self->{fh};
     unless ($ENV{CSPDEBUG})
       {
-  unlink $self->{conf} if $self->{conf};
+        unlink $self->{conf} if $self->{conf};
       }
     (defined $_[0]->{rc} ? $_[0]->{rc} : $?);
   }
