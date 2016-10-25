@@ -187,7 +187,7 @@ sub writeConfig
   my $date = localtime();
   $cf->print(<<EOW);
 
-\#\# This file is mashine generated and must not be edited
+\#\# This file is machine generated and must not be edited
 \#\# by hand. Please see the CSP-documentation for details.
 \#\# $date
 
@@ -419,7 +419,8 @@ sub genkey
       unless $args->{keyfile};
 
     $args->{keysize} = 4096 unless $args->{keysize} > 0;
-    $args->{keypass} = "'" . $self->getPassword("Private key password",1) . "'"
+    #$args->{keypass} = "'" . $self->getPassword("Private key password",1) . "'"
+    $args->{keypass} = $self->getPassword("Private key password",1)
       unless $args->{keypass};
 
     $self->warn("# Password argument: $args->{keypass}\n") if $ENV{CSPDEBUG};
@@ -1438,7 +1439,12 @@ sub cmd
     $cmd = '' if $cmd eq 'dummy';
 
     ${$self->{_in}} = "$cmd $cfgcmd $cmdline";
-    $self->warn("# openssl $cmd $cfgcmd $cmdline\n") if $ENV{CSPDEBUG};
+    
+    if ($ENV{CSPDEBUG}) {
+      $self->warn("This is where openssl is called");
+      $self->warn("Pass phrases with white space will cause a silent failure");
+      $self->warn("# openssl $cmd $cfgcmd $cmdline\n");
+    }
     $self->{_handle}->pump while length ${$self->{_in}};
     $self->{_handle}->finish;
 
