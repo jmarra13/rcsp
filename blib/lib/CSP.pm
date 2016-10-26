@@ -233,6 +233,7 @@ default_ca      = $self->{name}
 
 dir                     = \${csp::home}/csp/\${csp::ca}
 certs                   = \$dir/certs
+new_certs_dir           = \$certs
 database                = \$dir/index.txt
 certificate             = \$dir/ca.crt
 serial                  = \$dir/serial
