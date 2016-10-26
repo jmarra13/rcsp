@@ -1,5 +1,6 @@
  # File: ~/CA/ca/ca_env_source.sh
  # Usage: cd ~/CA/ca/ ; source  ~/CA/ca/ca_env_source.sh
+ # Modify the default settings to suit your needs.
 
  echo "Setting conveneince env variables for CSP."
 
@@ -12,7 +13,7 @@
  export CSPCA="CA_ISSUER_01"        # The Issuing CA - also kept offline
  export CSPCAROOT="CA_ROOT"         # The offline root CA
  export CSPCDAYS=1827               # The program default is 365 days
- export CSPDIGEST="SHA512"          # Do not use SHA1 
+ export CSPDIGEST="SHA512"          # Do not use SHA1
  export CSPKEYSIZE=4096             # Now 4096 is the default CSP.pm value
  export CSPTYPE="server"            # One of: objsign, server or user
  export CSPSAVE=$(date -u +%Y%m%d%H%M%SZ)
@@ -49,6 +50,32 @@
  echo "    CSPCDAYS: $CSPCDAYS"
  echo "CSPSTARTDATE: $CSPSTARTDATE"
  echo "  CSPENDDATE: $CSPENDDATE"
+
+ echo "To manually initialise a CA follow these steps:"
+ echo
+
+ echo "1. Generate the CA key:"
+ echo "openssl genrsa -out /path/to/csp/CA/private/ca.key 4096"
+ echo
+
+ echo "2. Generate a signing request for this key:"
+ echo "openssl req -new \ "
+ echo "   -key /path/to/csp/CA/private/ca.key \ "
+ echo "   -out /path/to/csp/CA/csrs/ca.csr "
+ echo
+
+ echo "3. Self sign the request:"
+ echo "   This method permits specifying the exact date and time"
+ echo "   of the certificate's effective and expiry. "
+ echo "openssl ca \ "
+ echo "   -selfsign \ "
+ echo "   -config    /path/to/csp/CA/tmp/X.conf \ "
+ echo "   -startdate 20161101000000Z \ "
+ echo "   -enddate   20171031235959Z \ "
+ echo "   -cert      /path/to/csp/CA/ca.crt \ "
+ echo "   -keyfile   /path/to/csp/CA/private/ca.key \ "
+ echo "   -out       /path/to/csp/CA/certs/revised_cert.crt \ "
+ echo "   -infiles   /path/to/csp/csrs/clientcert.csr "
 
  echo 'The following can be used to determine date offsets'
  echo 'to end-of-day UTC of the spcified date'
