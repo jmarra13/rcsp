@@ -346,6 +346,7 @@ sub createFiles
     close SERIAL;
     mkdir "$dir/tmp",00700;
     system('touch',"$dir/index.txt");
+    system('chmod',00644,"$dir/index.txt");
 
     mkdir "$dir/private",00700;
     mkdir "$dir/private/keys",00700;
