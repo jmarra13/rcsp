@@ -51,35 +51,42 @@
  echo "CSPSTARTDATE: $CSPSTARTDATE"
  echo "  CSPENDDATE: $CSPENDDATE"
 
- echo "To manually initialise a CA follow these steps:"
- echo
+cat <<-EOM
 
- echo "1. Generate the CA key:"
- echo "openssl genrsa -out /path/to/csp/CA/private/ca.key 4096"
- echo
+ To manually initialise a CA follow these steps:
 
- echo "2. Generate a signing request for this key:"
- echo "openssl req -new \ "
- echo "   -key /path/to/csp/CA/private/ca.key \ "
- echo "   -out /path/to/csp/CA/csrs/ca.csr "
- echo
 
- echo "3. Self sign the request:"
- echo "   This method permits specifying the exact date and time"
- echo "   of the certificate's effective and expiry. "
- echo "openssl ca \ "
- echo "   -selfsign \ "
- echo "   -config    /path/to/csp/CA/tmp/X.conf \ "
- echo "   -startdate 20161101000000Z \ "
- echo "   -enddate   20171031235959Z \ "
- echo "   -cert      /path/to/csp/CA/ca.crt \ "
- echo "   -keyfile   /path/to/csp/CA/private/ca.key \ "
- echo "   -out       /path/to/csp/CA/certs/revised_cert.crt \ "
- echo "   -infiles   /path/to/csp/csrs/clientcert.csr "
+ 1. Generate the CA key:
 
- echo 'The following can be used to determine date offsets'
- echo 'to end-of-day UTC of the spcified date'
- echo 'export TDATE=20361031'
+ openssl genrsa -out /path/to/csp/CA/private/ca.key 4096
+
+ 2. Generate a signing request for this key:
+
+ openssl req -new \\
+    -key /path/to/csp/CA/private/ca.key \\
+    -out /path/to/csp/CA/csrs/ca.csr
+
+ 3. Self sign the request:
+    This method permits specifying the exact date and time
+    of the certificate's effective and expiry.
+
+ openssl ca \\
+    -selfsign \\
+    -config    /path/to/csp/CA/tmp/X.conf \\
+    -startdate 20161101000000Z \\
+    -enddate   20171031235959Z \\
+    -cert      /path/to/csp/CA/ca.crt \\
+    -keyfile   /path/to/csp/CA/private/ca.key \\
+    -out       /path/to/csp/CA/certs/revised_cert.crt \\
+    -infiles   /path/to/csp/csrs/clientcert.csr
+
+
+ The following can be used to determine date offsets
+ to end-of-day UTC of the spcified date:
+
+EOM
+
+ echo 'export TDATE=20361031;'
  echo 'EDAYS=$(expr $(expr $(date '+%s' -d $TDATE) - $(date '+%s')) / 86400);'
  echo 'echo $EDAYS; EDATE="$(date +%F -u -d "$EDAYS days") 23:59:59";'
- echo 'echo $EDATE; NDATE=$(date -u '+%F %T %Z' -d "$EDATE"); echo $NDATE'
+ echo 'echo $EDATE; NDATE=$(date -u '+%F %T %Z' -d "$EDATE"); echo $NDATE;'
