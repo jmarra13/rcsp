@@ -1726,6 +1726,7 @@ Use openssl to dump the contents of the CA certificate:
 Now issue a new server certificate signed by PCA:
 
  [leifj@njal CSP]$ ./csp PCA issue \
+                     --dns=www.example.com \
                      --keysize=2048 \
                      --noconfirm \
                      'CN=www.example.com,dc=example,dc=com'
@@ -1736,15 +1737,18 @@ Now issue a new server certificate signed by PCA:
  [CSP][PCA     ] Signing request
 
 Check the contents of PCA database (the --xinfo arg gives you
-the sha1 and md5 fingerprints)
+the certificate fingerprints)
 
  [leifj@njal CSP]$ ./csp PCA list --xinfo
  Serial  : 01
  Status  : Valid
  Subject : CN=www.example.com,dc=example,dc=com
- Expires : Wed Oct 10 10:28:32 2001
- SHA1    : A3:53:D7:DF:AE:A2:44:0A:0F:B8:29:31:E7:96:16:62:1F:52:DF:62
- MD5     : 04:2A:3A:1B:BB:B9:1E:08:4D:C3:14:CE:71:72:CC:86
+ Expires : Wed Oct 28 20:08:18 2017
+ SHA512  : 3D:B2:F6:49:DD:44:86:39:E8:6D:1D:F6:FD:8A:11:04:B8:45:D1:4F:AE:99:45:A2:80:48:E0:A1:39:E5:3A:7B:45:7F:CF:85:38:DA:BA:E5:33:C7:A1:FC:E4:A6:3B:7D:BE:C1:E5:DA:5F:B9:B8:A1:15:A7:39:C5:10:E1:56:AD
+ SHA384  : 37:D9:4C:0F:A7:B3:BD:3C:5E:F3:97:63:39:DA:96:4C:64:9C:72:7E:9A:95:9E:1E:EF:E9:AB:F3:AE:B4:C4:49:81:E7:08:27:0A:A4:EB:F8:D8:D6:0F:92:56:4D:95:80
+ SHA256  : D7:36:9F:D2:CF:EA:A2:E5:51:A6:B7:A9:21:8C:64:E6:68:27:79:89:53:99:8B:29:A3:6A:73:43:2F:51:C5:69
+ SHA1    : BB:DB:2A:18:04:49:D4:5F:4D:41:10:C6:29:DD:0F:CE:D5:56:63:DB
+ MD5     : 68:82:90:8C:AA:9E:DA:52:43:7A:B2:E7:FB:55:D8:C1
 
 Finally generate the public web site
 
