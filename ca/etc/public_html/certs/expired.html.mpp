@@ -15,7 +15,7 @@
 
 %if %{EXPIRED_COUNT} > 0
     <p>
-      There are currently %{EXPIRED_COUNT} expired certificates in the 
+      There are currently %{EXPIRED_COUNT} expired certificates in the
       repository:
     </p>
     %{EXPIRED}
@@ -26,11 +26,11 @@
       There are no expired certificates in the repository.
     </p>
 %endif
-    
+
     <br>
     <hr>
     <font size="-1">
-      <a href="mailto:ca@example.com">ca@example.com</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
+      <a href="mailto:%{ISSUER_EMAIL}">%{ISSUER_EMAIL}</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
     </font>
   </body>
 </html>

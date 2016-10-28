@@ -15,7 +15,7 @@
 
 %if %{REVOKED_COUNT} > 0
     <p>
-      There are currently %{REVOKED_COUNT} revoked certificates in the 
+      There are currently %{REVOKED_COUNT} revoked certificates in the
       repository:
     </p>
     %{REVOKED}
@@ -26,11 +26,11 @@
       There are no revoked certificates in the repository.
     </p>
 %endif
-    
+
     <br>
     <hr>
     <font size="-1">
-      <a href="mailto:ca@example.com">ca@example.com</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
+      <a href="mailto:%{ISSUER_EMAIL}">%{ISSUER_EMAIL}</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
     </font>
   </body>
 </html>

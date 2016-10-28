@@ -12,12 +12,12 @@
 
   <body>
     <h1>CA Repository for %{SUBJECT_DN}</h1>
-    
+
     <p>
       Revoked certficates are only listed for informational
       purpouses. Download and use is strictly prohibited.
     </p>
-    
+
     <ul>
       <li><a href="valid.html">Valid Certificates</a></li>
       <li><a href="revoked.html">Revoked Certificates</a></li>
@@ -26,7 +26,7 @@
     <br>
     <hr>
     <font size="-1">
-      <a href="mailto:ca@example.com">ca@example.com</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
+      <a href="mailto:%{ISSUER_EMAIL}">%{ISSUER_EMAIL}</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
     </font>
   </body>
 </html>

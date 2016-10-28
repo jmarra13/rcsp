@@ -14,7 +14,7 @@
     <h1>%{SUBJECT_DN}</h1>
 
     <p>
-      Certificate information and downloads for <strong>%{SUBJECT_DN}</strong>. 
+      Certificate information and downloads for <strong>%{SUBJECT_DN}</strong>.
       Check the fingerprint unless signed by a known CA.
     </p>
 
@@ -26,13 +26,13 @@
     <li><a href="%{SUBJECT_SERIAL}.crt">DER format</a></li>
   </ul>
       </dd>
-      
+
       <dt>Subject:</dt>
       <dd><tt>%{SUBJECT_DN}</tt></dd>
-      
+
       <dt>Serial:</dt>
       <dd><tt>%{SUBJECT_SERIAL}</tt></dd>
-      
+
 %ifdef SUBJECT_NOTBEFORE
       <dt>Not Valid Before:</dt>
       <dd><tt>%{SUBJECT_NOTBEFORE}</tt></dd>
@@ -67,7 +67,7 @@
     <br>
     <hr>
     <font size="-1">
-  <a href="mailto:ca@example.com">ca@example.com</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
+  <a href="mailto:%{ISSUER_EMAIL}">%{ISSUER_EMAIL}</a>&nbsp;|&nbsp;<a href="../">%{SUBJECT_DN}</a>&nbsp;|&nbsp;Last modified: %{DATE}
     </font>
   </body>
 </html>

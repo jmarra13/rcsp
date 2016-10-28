@@ -723,7 +723,6 @@ sub genPublic
     my $expired_html = "<table border=\"1\" class=\"CERTS\">\n";
     my $date = localtime(time);
     my $cinfo = $self->certinfo("$dir/ca.crt");
-
     open XML,">$odir/certdb.xml";
 
     print XML <<EOXML;
@@ -733,20 +732,21 @@ EOXML
 
     foreach my $e ($self->list($args,'CSP::Entity'))
       {
-  my $html = $self->getCertHTMLOutFile($e,$odir);
-  my $vars = {
-        DATE=>$date,
-        HOSTNAME=>hostname,
-        SUBJECT_SERIAL => $e->{serial},
-        SUBJECT_DN => $e->{subject},
-        ISSUER_DN => $cinfo->{subject},
-        SUBJECT_SHA512 => $e->{info}->{fingerprint_sha512},
-        SUBJECT_SHA384 => $e->{info}->{fingerprint_sha384},
-        SUBJECT_SHA256 => $e->{info}->{fingerprint_sha256},
-        SUBJECT_SHA1 => $e->{info}->{fingerprint_sha1},
-        SUBJECT_MD5 => $e->{info}->{fingerprint_md5},
-        SUBJECT_NOTBEFORE => $e->{info}->{notbefore},
-        SUBJECT_NOTAFTER => $e->{info}->{notafter}
+        my $html = $self->getCertHTMLOutFile($e,$odir);
+        my $vars = {
+          DATE=>$date,
+          HOSTNAME=>hostname,
+          SUBJECT_SERIAL => $e->{serial},
+          SUBJECT_DN => $e->{subject},
+          ISSUER_DN => $cinfo->{subject},
+          ISSUER_EMAIL => $cinfo->{email},
+          SUBJECT_SHA512 => $e->{info}->{fingerprint_sha512},
+          SUBJECT_SHA384 => $e->{info}->{fingerprint_sha384},
+          SUBJECT_SHA256 => $e->{info}->{fingerprint_sha256},
+          SUBJECT_SHA1 => $e->{info}->{fingerprint_sha1},
+          SUBJECT_MD5 => $e->{info}->{fingerprint_md5},
+          SUBJECT_NOTBEFORE => $e->{info}->{notbefore},
+          SUBJECT_NOTAFTER => $e->{info}->{notafter}
        };
 
   my $serial = $e->{serial};
@@ -826,6 +826,7 @@ EOXML
       SUBJECT_NOTAFTER=>$cinfo->{notafter},
       SUBJECT_NOTBEFORE=>$cinfo->{notbefore},
       SUBJECT_DN=>$cinfo->{subject},
+      ISSUER_EMAIL => $cinfo->{email},
       SUBJECT_SHA512=>$cinfo->{fingerprint_sha512},
       SUBJECT_SHA384=>$cinfo->{fingerprint_sha384},
       SUBJECT_SHA256=>$cinfo->{fingerprint_sha256},
@@ -1217,7 +1218,11 @@ sub certinfo
 
     $info{hash} = $self->{openssl}->cmd('x509',"-noout -hash -in $certfile",{noconfig=>1});
 
-    local $_ = $self->{openssl}->cmd('x509',"-noout -serial -dates -subject -issuer -in $certfile",{noconfig=>1});
+    local $_ = $self->{openssl}->cmd('x509',"-noout -dates -email -issuer -serial -subject -in $certfile",{noconfig=>1});
+    if ($ENV{CSPDEBUG}) {
+      warn("$_" );
+    }
+
     while ($_)
       {
         s/^\s*\n//o;
@@ -1244,6 +1249,11 @@ sub certinfo
   elsif (s/^serial=\s*(.+)//o)
     {
       $info{serial}=$1;
+    }
+  elsif (s/^(.*\@.*\..*)//o)
+    {
+      $info{email}=$1;
+      warn("EMAIL is: $info{email}") if ($ENV{CSPDEBUG});
     }
       }
 
@@ -1657,7 +1667,7 @@ as a reference. A good way to get started is to copy this directory somewhere. S
 $CSPHOME to point to this directory. The layout of this directory is as follows:
 
  .
- |-- csp                  Certificate Authorities directory
+ |-- csp                      Certificate Authorities directory
  `-- etc
      |-- aliases.txt          Alternative names for DN attributes
      |-- extensions.conf      Default certificate extensions file
@@ -1809,6 +1819,7 @@ the following variables are available:
                     certificate.
   ISSUER_DN         The distinguished name (DN) of the
                     CA certificate.
+  ISSUER_EMAIL      The issuer email if present.
   SUBJECT_SHA512    The SHA512-fingerprint of the
                     certificate.
   SUBJECT_SHA384    The SHA384-fingerprint of the
@@ -1828,31 +1839,32 @@ When all other files in the directories (public_html and public_html/certs)
 are run through the macro preprocessor to produce HTML files the
 following variables are available:
 
-  DATE               The date (using localtime(time)) of
-                     the export operation.
-  VALID              An HTML table of valid certificates.
-  VALID_COUNT        The number of valid certificates.
-  REVOKED            An HTML table of revoked certificates.
-  REVOKED_COUNT      The number of revoked certificates.
-  EXPIRED            An HTML table of expired certificates.
-  EXPIRED_COUNT      The number of expired certificates.
-  SUBJECT_SERIAL     The serial number of the CA certificate.
-  SUBJECT_NOTAFTER   The date when the CA certificate
-                     expires.
-  SUBJECT_NOTBEFORE  The date when the CA certificate
-                     became valid.
-  SUBJECT_DN         The distinguished name (DN) of the
-                     CA certificate.
-  SUBJECT_MD5        The MD5-fingerprint of the CA
-                     certificate.
-  SUBJECT_SHA1       The SHA1-fingerprint of the CA
-                     certificate.
-  SUBJECT_SHA512     The SHA512-fingerprint of the
-                     certificate.
-  SUBJECT_SHA384     The SHA384-fingerprint of the
-                     certificate.
-  SUBJECT_SHA256     The SHA256-fingerprint of the
-                     certificate.
+  DATE              The date (using localtime(time)) of
+                    the export operation.
+  VALID             An HTML table of valid certificates.
+  VALID_COUNT       The number of valid certificates.
+  REVOKED           An HTML table of revoked certificates.
+  REVOKED_COUNT     The number of revoked certificates.
+  EXPIRED           An HTML table of expired certificates.
+  EXPIRED_COUNT     The number of expired certificates.
+  SUBJECT_SERIAL    The serial number of the CA certificate.
+  SUBJECT_NOTAFTER  The date when the CA certificate
+                    expires.
+  SUBJECT_NOTBEFORE The date when the CA certificate
+                    became valid.
+  SUBJECT_DN        The distinguished name (DN) of the
+                    CA certificate.
+  SUBJECT_SHA512    The SHA512-fingerprint of the
+                    certificate.
+  SUBJECT_SHA384    The SHA384-fingerprint of the
+                    certificate.
+  SUBJECT_SHA256    The SHA256-fingerprint of the
+                    certificate.
+  SUBJECT_SHA1      The SHA1-fingerprint of the
+                    certificate.
+  SUBJECT_MD5       The MD5-fingerprint of the
+                    certificate.
+  ISSUER_EMAIL      The issuer email if present.
 
 =head1 AUTHOR
 
