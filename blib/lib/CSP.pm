@@ -129,7 +129,7 @@ sub mppFile
     while (<IN>)
       {
   next if /^\#/;
-  
+
       SWITCH:
   {
     last SWITCH unless /^(%if|%ifdef|%endif)/ or $ctx->doPrint();
@@ -149,9 +149,9 @@ sub mppFile
     if (/^%if\s+(.+)$/)
         {
     my $expr = $1;
-    
+
     $expr =~ s/%{([A-Za-z0-9_\.]+)}/"\$vars->{\"$1\"}"/eg;
-    
+
     my $result = eval $expr;
     $self->die("$@") if $@;
     $ctx->push($result);
@@ -181,9 +181,9 @@ sub writeConfig
     my $cf = IO::File->new();
     eval
       {
-  $cf->open(">$cff") 
+  $cf->open(">$cff")
     or die "Unable to open $cff for writing";
-  
+
   my $date = localtime();
   $cf->print(<<EOW);
 
@@ -207,11 +207,11 @@ opensc = opensc_section
 dynamic_path = $ENV{CSP_OPENSC}/lib/opensc/engine_opensc.so
 
 EOW
-  
+
   ## Default section
   $cf->print("[ oids ]\n");
   $self->addFile($cf,"$self->{dir}/etc/oids.conf");
-  
+
   $cf->print("\n[ csp ]\n\n");
   my ($k,$v);
   while (($k,$v) = each %{$args})
@@ -221,7 +221,7 @@ EOW
   $cf->print("home\t= $self->{dir}\n");
   $cf->print("ca\t= $self->{name}\n");
   $cf->print("\n");
-  
+
   ## Main sections
   $cf->print(<<EOC);
 
@@ -258,9 +258,9 @@ prompt                  = no
 default_md              = sha512
 
 EOC
-  
+
   ## Extension based on command
-  
+
   my $type = $args->{type};
         my $name = $self->{name};
   if ($cmd eq 'x509' || $cmd eq 'req' || $cmd eq 'ca')
@@ -269,11 +269,11 @@ EOC
       foreach my $attr (keys %{$args->{name_attributes}})
         {
     next unless $attr;
-    if ($self->{aname}->{lc($attr)}) 
+    if ($self->{aname}->{lc($attr)})
       {
         $cf->print("$self->{aname}->{lc($attr)} = optional\n")
       }
-    else 
+    else
       {
         $cf->print("$attr = optional\n");
       }
@@ -290,7 +290,7 @@ EOC
         {
     my $econf = "$self->{dir}/csp/$name/extensions.conf";
     $econf = "$self->{dir}/etc/extensions.conf" unless -f $econf;
-    
+
     $self->mppFile($cf,$args,$econf);
         }
       $cf->print("\n\n");
@@ -298,7 +298,7 @@ EOC
         {
     my $econf = "$self->{dir}/csp/$name/crl_extensions.conf";
     $econf = "$self->{dir}/etc/crl_extensions.conf" unless -f $econf;
-    
+
     $self->mppFile($cf,$args,$econf);
         }
       $cf->print("\n");
@@ -321,7 +321,7 @@ EOC
         }
       $cf->print("\n");
     }
-  
+
   $cf->close;
       };
     if ($@)
@@ -383,7 +383,7 @@ sub getPassword
 
     system("stty -echo") &&
       $self->die("Unable to configure tty for password entry");
-  
+
     print STDERR $self->message("$comment: ");
     chop($pw = <STDIN>);
     print STDERR "\n";
@@ -472,13 +472,13 @@ sub init
       {
   $self->die("Required parameter dn missing")
     unless $args->{dn};
-  
+
   $args->{type} = 'root' unless $args->{type};
   $args->{days} = 3 * 365 unless $args->{days};
-  
+
   my $cakey = "$dir/private/ca.key";
   my $cacert = "$dir/ca.crt";
-  
+
   unless (-f $args->{keyfile})
     {
       ## Generate the CA key
@@ -490,9 +490,9 @@ sub init
       $self->die("CA key must have a password")
         unless defined($args->{keypass});
     }
-  
+
   $args->{capass} = $args->{keypass};
-  
+
   ## Generate and optionally self-sign the request
   my $process;
   my $what;
@@ -508,7 +508,7 @@ sub init
       $self->{openssl}->cmd('req',"-x509 $common_args -new -out $cacert",$args);
       $what = "initialized self-signed";
     }
-  
+
   $self->warn("Successfully $what CA $self->{name}")
     if $args->{verbose};
       }
@@ -663,14 +663,14 @@ sub list
     my $db = "$dir/index.txt";
     open DB,$db;
     my @out;
-    while (<DB>) 
+    while (<DB>)
       {
   chomp;
   my @row = split /\t/;
-  
+
   next if ($row[0] ne 'V' && !$args->{all});
   next if ($args->{serial} && $row[3] != $args->{serial});
-  
+
   my $entity = $eclass->new($self,\@row,$args->{xinfo},$args->{contents});
   push(@out,$entity) if ref $entity;
       }
@@ -702,12 +702,16 @@ sub genPublic
 
     $self->updatedb($args);
 
-    $args->{export} = "/mnt/floppy"
-      unless $args->{export};
+    unless ($args->{export})
+      {
+      $self->warn("Option --export= not specified. Using default.")
+        if $args->{verbose};
+      $args->{export} = "/mnt/floppy";
+      }
 
     $self->die("Not a directory: $args->{export}")
       unless -d $args->{export};
- 
+
     my $odir = $args->{export};
     mkdir "$odir/certs",00755;
 
@@ -744,9 +748,9 @@ EOXML
         SUBJECT_NOTBEFORE => $e->{info}->{notbefore},
         SUBJECT_NOTAFTER => $e->{info}->{notafter}
        };
-  
+
   my $serial = $e->{serial};
-  
+
   my $from = _isodateandtime($e->{info}->{notbefore});
   my $to = _isodateandtime($e->{info}->{notafter});
   print XML <<EOXML;
@@ -770,11 +774,11 @@ EOXML
       $vars->{SUBJECT_PKCS12} = "$serial.p12";
       system('cp',"$dir/p12/$serial.p12","$odir/certs/$serial.p12");
     }
-  
+
   my $file = $self->certFile($serial);
   $self->{openssl}->
     cmd('x509',"-in $file -outform DER -out $odir/certs/$serial.crt",{noconfig=>1});
-  
+
   system('cp',$file,"$odir/certs/$serial.pem");
 
   $self->mppFile($html,$vars,"$dir/public_html/certs/cert.html.mpp");
@@ -926,7 +930,7 @@ sub caBundle
   print BUNDLE "MD5 Fingerprint: $info->{fingerprint_md5}\n";
   print BUNDLE "PEM Data:\n";
   open CERT,$certfile;
-  while (<CERT>) 
+  while (<CERT>)
     {
       print BUNDLE $_;
     }
@@ -974,7 +978,7 @@ sub _time
     my ($self,$Dd,$Dh,$Dm,$Ds) = @_;
 
     my ($year,$month,$day,$hour,$min,$sec,$doy,$dow,$dst) = Gmtime();
-    my ($nyear,$nmonth,$nday,$nhour,$nmin,$nsec) = 
+    my ($nyear,$nmonth,$nday,$nhour,$nmin,$nsec) =
       Add_Delta_DHMS($year,$month,$day,$hour,$min,$sec,$Dd,$Dh,$Dm,$Ds);
 
     my $tmp = sprintf("%02d%02d%02d%02d%02d%02dZ",$nyear,$nmonth,$nday,$nhour,$nmin,$nsec);
@@ -1015,14 +1019,14 @@ sub issue
       $self->dumpreq($args->{csrfile});
       $self->confirm("Really sign this?","Bye...");
     }
-  
+
   $self->warn("Signing request") if $args->{verbose};
-  
+
   my $serial;
   open SERIAL,"$dir/serial";
   chomp($serial = <SERIAL>);
   close SERIAL;
-  
+
   $args->{capass} = $self->getPassword("CA Private key password")
     unless $args->{capass};
   $self->die("CA key must have a password")
@@ -1392,7 +1396,7 @@ package CSP::OpenSSL;
 my $_unset=<<EOTXT;
 ***
 The environment variable OPENSSL is not set. This
-variable must contain the absolute path to the 
+variable must contain the absolute path to the
 OpenSSL binary in order for CSP::OpenSSL to work
 ***
 EOTXT
@@ -1441,7 +1445,7 @@ sub cmd
     $cmd = '' if $cmd eq 'dummy';
 
     ${$self->{_in}} = "$cmd $cfgcmd $cmdline";
-    
+
     if ($ENV{CSPDEBUG}) {
       $self->warn("This is where openssl is called");
       $self->warn("Pass phrases with white space will cause a silent failure");
@@ -1577,7 +1581,7 @@ CSP - A wrapper around OpenSSL for maintaining multiple Certificate Authorities.
 
 =head1 DESCRIPTION
 
-CSP is a perl module which uses openssl (openssl version 0.9.6 or later is required). 
+CSP is a perl module which uses openssl (openssl version 0.9.6 or later is required).
 Features include
 
 =over 4
@@ -1604,7 +1608,7 @@ CSP can be used to produce a web site (certificate repository, CRLs etc etc)
 without the need for cgi-scripts.
 
 =item o
- 
+
 CSP tries to be as PKIX-compliant as OpenSSL allows.
 
 =back
@@ -1614,7 +1618,7 @@ CSP tries to be as PKIX-compliant as OpenSSL allows.
 The typical application for CSP is a small CA (which may or may not be part
 of a larger pki) issuing mainly server and object signing certificates and only
 few if any user certificates. The distinction between user and other certificates
-may seem arbitrary but experience shows that managing a large set of user 
+may seem arbitrary but experience shows that managing a large set of user
 certificates typically requires a more sofisticated system for managing and
 tracking requests.
 
@@ -1622,8 +1626,8 @@ When setting up CSP for production use the author strongly recommends using a
 non network connected host for the CA operations. This computer will not use
 much CPU or disk resources and any old PC with Linux or *BSD should work
 admirably. An old laptop might be a very good choice since it can be locked
-away when not in use. It might be a good idea to equip the computer with a cd 
-writer or some other means for making backups of the certificate directory. 
+away when not in use. It might be a good idea to equip the computer with a cd
+writer or some other means for making backups of the certificate directory.
 Day to day operations include the following tasks.
 
 =over 4
@@ -1648,13 +1652,13 @@ zip-drive) to your web server.
 First set the environment variable OPENSSL to contain the absolute path of your
 OpenSSL binary. This is a requirement for everything that follows. Next create a
 directory where you will keep your CAs. This can be any directory anywhere in your
-file system owned by anyone. A sample directory "ca" in the distribution is included 
+file system owned by anyone. A sample directory "ca" in the distribution is included
 as a reference. A good way to get started is to copy this directory somewhere. Set
 $CSPHOME to point to this directory. The layout of this directory is as follows:
 
  .
  |-- csp                  Certificate Authorities directory
- `-- etc                        
+ `-- etc
      |-- aliases.txt          Alternative names for DN attributes
      |-- extensions.conf      Default certificate extensions file
      |-- crl_extensions.conf  Default crl extensions
@@ -1721,7 +1725,7 @@ Now issue a new server certificate signed by PCA:
  [CSP][PCA     ] Create certificate request for CN=CA,dc=su,dc=se
  [CSP][PCA     ] Signing request
 
-Check the contents of PCA database (the --xinfo arg gives you 
+Check the contents of PCA database (the --xinfo arg gives you
 the sha1 and md5 fingerprints)
 
  [leifj@njal CSP]$ ./csp PCA list --xinfo
@@ -1744,8 +1748,8 @@ Now move /tmp/export to a removable medium and transport it to your web server.
 Configuration of extensions is done in the etc/<ca name>extensions.conf. The
 format of this file is equivalent to the openssl extensions format. Read more
 about this in the openssl documentation.
-This file also supports a simple macro format similar to transarc mpp which in 
-turn is essentially CPP with '%' as the magic character. The following macros 
+This file also supports a simple macro format similar to transarc mpp which in
+turn is essentially CPP with '%' as the magic character. The following macros
 are supported:
 
  %ifdef/%endif
@@ -1787,44 +1791,44 @@ export directory (specified by --export) which looks like this:
   |-- crl-v2.crl
   `-- index.html
 
-The ca.crt, crl-v1.crl and crl-v2.crl are copies of the corresponding 
+The ca.crt, crl-v1.crl and crl-v2.crl are copies of the corresponding
 files from the master repository. Each certificate in the repository
 is stored in <export>/certs as DER, PEM and as an HTML page derived
-from public_html/certs/cert.html.mpp by macro expansion. All other 
-pages are simply produced by macro expansion of the corresponding 
+from public_html/certs/cert.html.mpp by macro expansion. All other
+pages are simply produced by macro expansion of the corresponding
 .mpp-files and apart from certs/cert.html.mpp none of these files need
 exist or have the names they have in the example above.
 
-When performing macro expansion on public_html/certs/cert.html.mpp 
+When performing macro expansion on public_html/certs/cert.html.mpp
 the following variables are available:
 
-  DATE              The date (using localtime(time)) of 
+  DATE              The date (using localtime(time)) of
                     the export operation.
   SUBJECT_SERIAL    The serial number of the certificate.
-  SUBJECT_DN        The distinguished name (DN) of the 
+  SUBJECT_DN        The distinguished name (DN) of the
                     certificate.
-  ISSUER_DN         The distinguished name (DN) of the 
+  ISSUER_DN         The distinguished name (DN) of the
                     CA certificate.
-  SUBJECT_SHA512    The SHA512-fingerprint of the 
+  SUBJECT_SHA512    The SHA512-fingerprint of the
                     certificate.
-  SUBJECT_SHA384    The SHA384-fingerprint of the 
+  SUBJECT_SHA384    The SHA384-fingerprint of the
                     certificate.
-  SUBJECT_SHA256    The SHA256-fingerprint of the 
+  SUBJECT_SHA256    The SHA256-fingerprint of the
                     certificate.
-  SUBJECT_SHA1      The SHA1-fingerprint of the 
+  SUBJECT_SHA1      The SHA1-fingerprint of the
                     certificate.
-  SUBJECT_MD5       The MD5-fingerprint of the 
+  SUBJECT_MD5       The MD5-fingerprint of the
                     certificate.
-  SUBJECT_NOTBEFORE The date when this certificate 
+  SUBJECT_NOTBEFORE The date when this certificate
                     becomes valid.
-  SUBJECT_NOTAFTER  The date when this certificate 
+  SUBJECT_NOTAFTER  The date when this certificate
                     expires.
 
 When all other files in the directories (public_html and public_html/certs)
 are run through the macro preprocessor to produce HTML files the
 following variables are available:
 
-  DATE               The date (using localtime(time)) of 
+  DATE               The date (using localtime(time)) of
                      the export operation.
   VALID              An HTML table of valid certificates.
   VALID_COUNT        The number of valid certificates.
@@ -1833,21 +1837,21 @@ following variables are available:
   EXPIRED            An HTML table of expired certificates.
   EXPIRED_COUNT      The number of expired certificates.
   SUBJECT_SERIAL     The serial number of the CA certificate.
-  SUBJECT_NOTAFTER   The date when the CA certificate 
+  SUBJECT_NOTAFTER   The date when the CA certificate
                      expires.
-  SUBJECT_NOTBEFORE  The date when the CA certificate 
+  SUBJECT_NOTBEFORE  The date when the CA certificate
                      became valid.
-  SUBJECT_DN         The distinguished name (DN) of the 
+  SUBJECT_DN         The distinguished name (DN) of the
                      CA certificate.
-  SUBJECT_MD5        The MD5-fingerprint of the CA 
+  SUBJECT_MD5        The MD5-fingerprint of the CA
                      certificate.
-  SUBJECT_SHA1       The SHA1-fingerprint of the CA 
+  SUBJECT_SHA1       The SHA1-fingerprint of the CA
                      certificate.
-  SUBJECT_SHA512     The SHA512-fingerprint of the 
+  SUBJECT_SHA512     The SHA512-fingerprint of the
                      certificate.
-  SUBJECT_SHA384     The SHA384-fingerprint of the 
+  SUBJECT_SHA384     The SHA384-fingerprint of the
                      certificate.
-  SUBJECT_SHA256     The SHA256-fingerprint of the 
+  SUBJECT_SHA256     The SHA256-fingerprint of the
                      certificate.
 
 =head1 AUTHOR
@@ -1857,7 +1861,7 @@ Stockholm University
 
 =head1 ACKNOWLEDGEMENTS
 
-The web site generation was inspired by work by 
+The web site generation was inspired by work by
 Heinar Hillbom <Einar.Hillbom@umdac.umu.se> UMDAC, Umeå Universitet
 
 =head1 SEE ALSO
