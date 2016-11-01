@@ -340,6 +340,7 @@ sub createFiles
     my $dir = $self->caDir();
 
     mkdir $dir,00755;
+    mkdir "$dir/csrs",00755;
     mkdir "$dir/certs",00755;
     open SERIAL,">$dir/serial";
     print SERIAL "01\n";
