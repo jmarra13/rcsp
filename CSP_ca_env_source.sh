@@ -89,4 +89,4 @@ EOM
  echo 'export TDATE=20361031;'
  echo 'EDAYS=$(expr $(expr $(date '+%s' -d $TDATE) - $(date '+%s')) / 86400);'
  echo 'echo $EDAYS; EDATE="$(date +%F -u -d "$EDAYS days") 23:59:59";'
- echo 'echo $EDATE; NDATE=$(date -u '+%F %T %Z' -d "$EDATE"); echo $NDATE;'
+ echo 'echo $EDATE; NDATE=$(date -u "+%F %T %Z" -d "$EDATE"); echo $NDATE;'
