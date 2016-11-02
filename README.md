@@ -192,10 +192,15 @@ cp ./csp/CA_HLL_ROOT_2016/certs/01.pem to /csp/CA_HLL_ROOT_2016/ca.crt
 ```
 
 Do not delete, remove or rename `./csp/CA_HLL_ROOT_2016/certs/01.pem` or
-any other file comprising the CA database. Manually manipulating files in
-the CA database has a very real risk of damaging the PKI to the point of
-uselessness.  The exception being `extensions.conf` which often requires
-customisation for a specific signing request.
+any other file comprising the CA database. The serial number must be the
+name of a certificate's associated `.pem` file and this must reside in
+the `certs/` directory. Likewise the `index.txt` file must not be edited,
+removed or renamed.
+
+Manually manipulating files in the CA database has a very real risk of
+damaging the PKI to the point of uselessness.  The exception being
+`extensions.conf` which often requires customisation for a specific
+signing request.
 
 > Warning:
 > Do not even try to reuse a serial number or attempt to clean up
