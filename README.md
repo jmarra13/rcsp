@@ -362,7 +362,7 @@ csp CA_HLL_ISSUER_2016 issue \
   --days=528 \
   --digest=SHA512 \
   --keysize=4096 \
-  --email=username@harte-lyne.ca \
+  --email=useremail@harte-lyne.ca \
   --url=mailto:useremail@harte-lyne.ca \
   "CN=User Name,OU=Employee,O=Harte & Lyne Limited,L=Hamilton,ST=Ontario,C=CA,DC=hamilton,DC=harte-lyne,DC=ca"
 ```
