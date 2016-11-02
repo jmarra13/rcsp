@@ -66,6 +66,13 @@ cd /path/to/my-ca
 cp -pr /path/to/csp/ca/etc ./etc
 ```
 
+## Define the required environment variables
+
+```
+export CSPHOME=$(pwd)
+export OPENSSL=$(which openssl)
+```
+
 ## Create the root CA.
 
 ```
@@ -147,16 +154,54 @@ openssl ca  \
   -infiles ./csp/CA_HLL_ROOT_2016/csrs/ca.csr
 ```
 
-This creates the first certificate, 01.pem, in the
-`./csp/CA_HLL_ROOT_2016/certs/` directory.
+This creates the first certificate, `01.pem`, in the
+`./csp/CA_HLL_ROOT_2016/certs/` directory.  Note that `csp` serialises
+certificate numbers in hexadecimal.  When the tenth certicicate is
+produced the serial number will be `0A` and the certificate will be
+saved as `0A.pem`.
+
+The first serial number defaults to `01`. This can be changed by
+modifying the `serial` file for the CA.  If this modification is
+made then take care not to introduce the possibility of reusing
+previously issued serial numbers.  The value is best left alone
+once the first certificate is issued by the CA.
+
+```
+echo 20160001 > ./csp/CA_HLL_ROOT_2016/serial
+```
+
+The example above causes certificate serial numbers to start at
+20160001 (hexadecimal).
+
+## Copy the created pem certificate to the CA's home directory.
+
+`csp` expects that the CA certificate is called `ca.crt` and resides
+in the root of the CA's working directory.  `csp` also expects that its
+private key will likewise be named `ca.key` and reside in the
+`private/` directory under the CA's working directory root.
+
+If the default `csp CANAME init` path is taken and a separate `ca.csr`
+request is not generated then both these files are placed in those
+locations automatically. As the example above does not follow that path
+some further housekeeping is required.
+
 Copy `./csp/CA_HLL_ROOT_2016/certs/01.pem to /csp/CA_HLL_ROOT_2016/ca.crt`.
-Do not delete, remove or rename `./csp/CA_HLL_ROOT_2016/certs/01.pem`.
-Manually manipulating files in the CA database has a very real risk
-of damaging the PKI to the point of uselessness.
 
 ```
 cp ./csp/CA_HLL_ROOT_2016/certs/01.pem to /csp/CA_HLL_ROOT_2016/ca.crt
 ```
+
+Do not delete, remove or rename `./csp/CA_HLL_ROOT_2016/certs/01.pem` or
+any other file comprising the CA database. Manually manipulating files in
+the CA database has a very real risk of damaging the PKI to the point of
+uselessness.  The exception being `extensions.conf` which often requires
+customisation for a specific signing request.
+
+> Warning:
+> Do not even try to reuse a serial number or attempt to clean up
+> the CA database following a botched issue or signing attempt.
+> Serial numbers are cheap and limitless.  Just revoke the resulting
+> certificate and move on to the next number.
 
 ## Create the issuing CA key and certificate.
 
@@ -367,12 +412,29 @@ csp CA_HLL_ISSUER_2016 issue \
   "CN=User Name,OU=Employee,O=Harte & Lyne Limited,L=Hamilton,ST=Ontario,C=CA,DC=hamilton,DC=harte-lyne,DC=ca"
 ```
 
-After each certificate issuing session the CRL and public website
-of the issuing CA should be updated.  These should be updated every
-thirty (30) days in any case.  Note that the directory for outputting
-the html files can be any convenient location.  When the output
-location is not specified on the command line `csp` defaults to
-`/mnt/floppy`.
+In these cases distributing the resulting private key:
+
+`csp/CA_HLL_ISSUER_2016/private/keys/HH.pem`
+
+and certificate:
+
+`csp/CA_HLL_ISSUER_2016/certs/HH.pem`
+
+is the responsibility of the CA operator.  Generally private keys should
+be encrypted when created and the two elements should be packaged together
+for transmission to the end user.  Server keys typically are
+not encrypted and so these must be moved to their hosts via some
+secure method.  Implicit with unencrypted server keys is that the hosts
+they are installed on must be physically secure from unauthorised access.
+
+After each CA management session the operator must regenerate
+the Certificate Revocation List (CRL) and rebuild the public website.
+Both of these should be updated every thirty (30) days in any case.
+
+The directory for outputting the html files can be any directory or
+device accessible from the host. When no output location is specified
+on the command line `csp` defaults to `/mnt/floppy`. This usually fails.
+
 
 ```
 for CSPCA in CA_HLL_ROOT_2016 CA_HLL_ISSUER_2016; \
