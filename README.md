@@ -39,13 +39,34 @@ keys might be compromised is never permitted to arise.  That implies that
 the medium holding the CA keys is never left unsecured; or unobserved when
 in use; or inserted into a host that has multiple user access enabled.
 
+## A note on private key encypherment passwords
+
+OpenSSL permits the use of key encypherment pass phrases that include
+embedded spaces.  However, the `csp` script presently passes its arguments
+to `openssl` as a string.  The method used to call `openssl` from within
+the script treats a space as a delimiter for string arguments. Neither
+can a pass-phrase protected by single or double quotes be successfully
+used as these characters are strpped by the Perl module used to invoke
+`openssl`.
+
+Thus it is not possible to use a pass-phrase containing spaces with csp.
+If such a phrase is desired then `openssl rsa` must be called directly to
+reset the key encryption phrase after it is created:
+
+```
+openssl rsa -v -aes256 -in short_password.key -out passwd_with_spaces.key
+```
+
 # Creating a root CA
 
-Some browsers no longer allow self-signed certificates to be added their
-trusted certificate store.  Thus it is necessary that a private CA use a
-different CA than their root CA to issue end use certificates.  Generally
-speaking, the PKI root CA is only required to create additional issuing CA's
-or replacements for compromised issuing CA's.
+Some applications no longer allow self-signed certificates to be added
+their trusted certificate store.  Thus, to meet this requirement, it is
+necessary that a private PKI use a CA other than their root CA to issue
+end-use certificates.
+
+Generally speaking, when subordinate issuing CAs are employed in a PKI,
+the root CA is only used to create additional issuing CA's; or replacements
+for compromised issuing CA's.
 
 ## Add the csp script location to your PATH
 
@@ -448,4 +469,17 @@ for CSPCA in CA_HLL_ROOT_2016 CA_HLL_ISSUER_2016; \
  done;
 ```
 
+## A most curious error
 
+When signing a new certificate one may encounter the following `openssl` error:
+
+```
+140128600782664:error:0E06D06C:configuration file routines:
+NCONF_get_string:no value:conf_lib.c:335:group=TESTCA name=email_in_dn
+```
+
+This information provided in this error is completely irrelevant to the
+actual cause.  The most frequent cause of this error is attempting to add
+a certificate to the certificate database (`index.txt`) where the DN of
+the new certificate is identical to the DN of a certificate already in
+the database AND the setting `unique_subject=yes` is found in `index.txt.attr`.
