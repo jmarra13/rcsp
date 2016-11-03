@@ -18,7 +18,7 @@
  export CSPTYPE="server"            # One of: objsign, server or user
  export CSPSAVE=$(date -u +%Y%m%d%H%M%SZ)
  export CSPSTARTDATE=$(date +%Y%m%d%H%M%SZ)
- export CSPENDDATE=$(date -d +"$CSPCDAYS"days +%Y%m%d000000Z)
+ export CSPENDDATE=$(date -d +"$CSPCDAYS"days +%Y%m%d235959Z)
  x=$CSPSTARTDATE
  DS=$(date -d"${x:0:8} ${x:8:2}:${x:10:2}:${x:12:3}")
  x=$CSPENDDATE
@@ -41,7 +41,8 @@
  export DCTL='com'                # our registry top level authority
 
  echo "The following convenience env variables are now set as displayed below:"
- env | grep -E "^CN|^CS|^DC" | sort
+ env | grep -E "^CN|^CS|^DC|^OPENSSL" | sort
+ echo ""
 
  echo "The Distinguished Name (DN) constructed from these variables is:"
  echo \"CN=$DCHN.$DCLO.$DCDN.$DCTL,OU=$CNOU,O=$CNON,L=$CNLO,ST=$CNST,C=$CNCO,DC=$DCLO,DC=$DCDN,DC=$DCTL\"
@@ -90,3 +91,27 @@ EOM
  echo 'EDAYS=$(expr $(expr $(date '+%s' -d $TDATE) - $(date '+%s')) / 86400);'
  echo 'echo $EDAYS; EDATE="$(date +%F -u -d "$EDAYS days") 23:59:59";'
  echo 'echo $EDATE; NDATE=$(date -u "+%F %T %Z" -d "$EDATE"); echo $NDATE;'
+
+
+cat <<-EOM
+
+ Issuing a private key and matching certificate with start and end dates
+ specified using the convenience environment variables:
+
+ export CSPTYPE=user
+ export CSPSTARTDATE=$CSPSTARTDATE
+ export CSPENDDATE=$CSPENDDATE
+ export CNEM='user_email@example.com'
+ export DCHN='User N. Ame'
+
+ csp \$CSPCA issue \\
+    --type=\$CSPTYPE \\
+    --keysize=\$CSPKEYSIZE \\
+    --digest=\$CSPDIGEST \\
+    --startdate=\$CSPSTARTDATE \\
+    --enddate=\$CSPENDDATE \\
+    --email=\$CNEM \\
+    --url=ca.harte-lyne.ca \\
+    "CN=\$DCHN.\$DCLO.\$DCDN.\$DCTL,OU=\$CNOU,O=\$CNON,L=\$CNLO,ST=\$CNST,C=\$CNCO,DC=\$DCLO,DC=\$DCDN,DC=\$DCTL"
+
+EOM
