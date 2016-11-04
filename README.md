@@ -24,30 +24,37 @@ using CSP.
 
 2016-Nov-01 byrnejb@Harte-Lyne.ca
 
-This procedure creates an `X509` PKI with a offline root CA and separate
-issuing CAs. All CA's should be kept offline when not actively in use.
-Whenever a CA is in use then the host employed should be first disconnected
-from all networks (LAN and Internet). It will likely prove most convenient
-to keep the CA directory trees on removable media such as USB flash
-memory sticks or SD cards. These must be stored in a secure location and
-only inserted into the host used to manage the PKI when required.
+This procedure creates an `X509` PKI with a root CA with subordinate CAs
+issing end-use certificate. For reasons of security the private keys of
+all CA's that form part of a deployed PKI should be kept offline and
+physically secured when not in use.  Likewise, all private keys of any
+end-use certificates must be controlled in the same fashion.
+
+Whenever a CA private key is in use then the host employed should be first
+disconnected from all networks (LAN and Internet). Consequently It will
+likely prove most convenient to keep the CA directory trees on removable
+media such as USB flash memory sticks or SD cards. When so employed
+removable media must be stored in a secure location and only inserted
+into the host used to manage the PKI when required and under direct
+supervision of an authorised user.
 
 It is advised that a separate user id be created solely for the purpose
-of administering the PKI.  Failing that then the root user should be used.
-In either case care must be taken that any situation where the private
-keys might be compromised is never permitted to arise.  That implies that
-the medium holding the CA keys is never left unsecured; or unobserved when
-in use; or inserted into a host that has multiple user access enabled.
+of administering the PKI.  Failing that then a system priviledged user
+should be used. In either case care must be taken that any situation
+where the private keys might be compromised is never permitted to arise.
+That implies that the medium holding the CA keys is never left unsecured;
+or unobserved when in use; or inserted into a host that has multiple user
+access enabled.
 
 ## A note on private key encypherment passwords
 
 OpenSSL permits the use of key encypherment pass phrases that include
-embedded spaces.  However, the `csp` script presently passes its arguments
-to `openssl` as a string.  The method used to call `openssl` from within
-the script treats a space as a delimiter for string arguments. Neither
-can a pass-phrase protected by single or double quotes be successfully
-used as these characters are strpped by the Perl module used to invoke
-`openssl`.
+embedded spaces.  However, the `csp` script presently passes all its
+arguments to `openssl` as a single string.  The method used to call
+`openssl` from within the perl script treats a space as a delimiter
+for arguments passed in this fashion. As single or double quotes
+are stripped by the Perl module used to invoke `openssl` there is no
+method of escaping pass-phrases that contain spaces.
 
 Thus it is not possible to use a pass-phrase containing spaces with csp.
 If such a phrase is desired then `openssl rsa` must be called directly to
