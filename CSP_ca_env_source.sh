@@ -40,19 +40,7 @@
  export DCDN='example'            # our domain name
  export DCTL='com'                # our registry top level authority
 
- echo "The following convenience env variables are now set as displayed below:"
- env | grep -E "^CN|^CS|^DC|^OPENSSL" | sort
- echo ""
-
- echo "The Distinguished Name (DN) constructed from these variables is:"
- echo \"CN=$DCHN.$DCLO.$DCDN.$DCTL,OU=$CNOU,O=$CNON,L=$CNLO,ST=$CNST,C=$CNCO,DC=$DCLO,DC=$DCDN,DC=$DCTL\"
-
- echo "The env variable start and end dates for certificates are:"
- echo "    CSPCDAYS: $CSPCDAYS"
- echo "CSPSTARTDATE: $CSPSTARTDATE"
- echo "  CSPENDDATE: $CSPENDDATE"
-
-cat <<-EOM
+ cat <<-EOM
 
  To manually initialise a CA follow these steps:
 
@@ -111,7 +99,21 @@ cat <<-EOM
     --startdate=\$CSPSTARTDATE \\
     --enddate=\$CSPENDDATE \\
     --email=\$CNEM \\
-    --url=ca.harte-lyne.ca \\
+    --url=ca.example.com \\
     "CN=\$DCHN.\$DCLO.\$DCDN.\$DCTL,OU=\$CNOU,O=\$CNON,L=\$CNLO,ST=\$CNST,C=\$CNCO,DC=\$DCLO,DC=\$DCDN,DC=\$DCTL"
 
 EOM
+
+ echo "The following convenience env variables are now set as displayed below:"
+ env | grep -E "^CN|^CS|^DC|^OPENSSL" | sort
+ echo ""
+
+ echo "The Distinguished Name (DN) constructed from these variables is:"
+ echo \"CN=$DCHN.$DCLO.$DCDN.$DCTL,OU=$CNOU,O=$CNON,L=$CNLO,ST=$CNST,C=$CNCO,DC=$DCLO,DC=$DCDN,DC=$DCTL\"
+
+ echo "The env variable start and end dates for certificates are:"
+ echo "    CSPCDAYS: $CSPCDAYS"
+ echo "CSPSTARTDATE: $CSPSTARTDATE"
+ echo "  CSPENDDATE: $CSPENDDATE"
+
+
