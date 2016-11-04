@@ -100,7 +100,10 @@ cat <<-EOM
     --enddate=\$CSPENDDATE \\
     --email=\$CNEM \\
     --url=ca.example.com \\
-    "CN=\$DCHN.\$DCLO.\$DCDN.\$DCTL,OU=\$CNOU,O=\$CNON,L=\$CNLO,ST=\$CNST,C=\$CNCO,DC=\$DCLO,DC=\$DCDN,DC=\$DCTL"
+    "CN=\$DCHN.\$DCLO.\$DCDN.\\
+    \$DCTL,OU=\$CNOU,O=\$CNON,\\
+    L=\$CNLO,ST=\$CNST,\\
+    C=\$CNCO,DC=\$DCLO,DC=\$DCDN,DC=\$DCTL"
 
 EOM
 
