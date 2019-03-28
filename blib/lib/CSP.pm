@@ -246,6 +246,7 @@ default_crl_days        = 30
 default_md              = sha512
 preserve                = no
 policy                  = policy
+copy_extensions         = copyall
 
 [ req ]
 
@@ -1879,7 +1880,7 @@ Stockholm University
 =head1 ACKNOWLEDGEMENTS
 
 The web site generation was inspired by work by
-Heinar Hillbom <Einar.Hillbom@umdac.umu.se> UMDAC, Umeå Universitet
+Heinar Hillbom <Einar.Hillbom@umdac.umu.se> UMDAC, UmeÃ¥ Universitet
 
 =head1 SEE ALSO
 
